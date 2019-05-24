@@ -1,0 +1,101 @@
+\title{Design, implementation, and evaluation of Napali: a novel distributed sensor network for improved power quality monitoring.}
+\author{
+        Sergey Negrashov \\
+                Department of Information and Computer Science\\
+}
+\date{\today}
+
+\documentclass[11pt]{uhthesis}
+\author{Sergey Negrashov}
+%% Month in which you intend to receive your degree (i.e. graduation).
+%% Presumably this will be one of: May, August, or December.
+\degreemonth{December}
+%% Year of expected graduation.
+\degreeyear{2018}
+%% Type of degree to be conferred.
+\degree{Doctor of Philosophy}
+%% This is the chairperson of your committee. Do not use titles like Dr.
+\chair{Philip Johnson}
+%% The other members of your committee, seperated by "\\". Again, no titles,
+%% and it is customary to list the outside committee member (if you have one)
+%% last.
+\othermembers{Peter-Michael Seidel\\
+Edo Biagioni\\
+Lipyeow Lim\\
+Matthias Fripp
+}
+%% The field in which you are obtaining your degree, capitalized normally.
+\field{Computer Science}
+%% If your discipline allows subfields, you can add it here. Note that this
+%% is strictly controlled, so consult the Style & Policy guide before adding
+%% a subfield.
+%\subfield{Bioinformatics}
+%% 4-6 optional keywords/phrases for use in indexing or as search terms
+\keywords{Sensor Network, Distributed Sensing, Grid Computing, Power Quality}
+%% The version number of your document. Consistent use of this will enable you
+%% to tell old drafts from new ones. Final actual documents omit this
+%% automatically so you can use it without fear of submission problems at the
+%% end. If you do not define this parameter, it defaults to "1.0.0".
+\versionnum{4.0.0}
+
+%%% End of preamble
+
+\usepackage{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{indentfirst}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage[hidelinks]{hyperref}
+
+\begin{document}
+\maketitle
+
+\begin{frontmatter}
+
+%%% Note, there is no longer a signature page included in the document, it
+%%% has been replaced by Form IV
+
+%%% Create the copyright page (optional)
+\copyrightpage
+
+%%% Bring in the dedication page from external file (optional)
+\include{dedication}
+
+%%% Bring in the acknowledgments section from external file (optional)
+\include{acknowledgments}
+
+%%% Bring in the abstract section from external file
+\include{abstract}
+
+%%% Generate table of contents
+\tableofcontents
+
+%%% Generate list of tables
+\listoftables
+
+%%% Generate list of figures
+\listoffigures
+
+\end{frontmatter}
+
+\chapter{Introduction}
+
+\input{intro.tex}
+
+\chapter{Related Work}
+
+\input{litreview.tex}
+
+\chapter{Open Power Quality}
+\input{opq.tex}
+
+\chapter{Evaluation}
+\input{expdes.tex}
+
+
+
+\bibliography{dissertation.bib}
+\bibliographystyle{plain}
+  
+\end{document}
