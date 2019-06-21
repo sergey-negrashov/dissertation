@@ -1,6 +1,6 @@
-Power quality research is a subset of power distribution research which focuses on studying  deviations from nominal power grid operating conditions.
+Power quality research is a subset of power distribution research which focuses on studying deviations from nominal power grid operating conditions.
 Devices connected to the power grid, as well as the distribution equipment expect a certain frequency, voltage and harmonic content of the voltage waveform they operate on.
-While most equipment maintains some hysteresis with respect to deviations from the nominal, large enough deviations may cause equipment failure and instability in the power grid as a whole.
+While most equipment maintains some operational hysteresis with respect to deviations from the nominal, large enough deviations may cause equipment failure and instability in the power grid as a whole.
 In a practical sense, power quality monitoring concerns itself with monitoring, collecting and analyzing power quality anomalies on a live and functioning grid.
 In some cases, for example when performed by the utility, this information is used to make real-time decisions, to maintain the stability of the power grid.
 However, data collected by the power quality monitoring equipment can also be used to diagnose local power quality problems, or to further power quality research.
@@ -74,20 +74,20 @@ An alternative to sending all of the distributed measurements to the sink is to 
 This approach, called self triggering, has a benefit of the reducing the bandwidth constraints for each sensor without the requirement for two way communication between the sensor and the sink.
 
 \section{Napali: hybrid edge computing for anomaly detection.} \label{intro:section:napali}
-  
+
 I developed a framework called Napali which combines the strengths of the previously mentioned methods.
 In Napali, each sensor node maintains a two way communication channel with the sink, as well as a temporal window containing all the recent data each device has collected.
 Each sensor's on board processing is used to extract features from the collected measurements, and only these features, instead of the entire measurement set are forwarded to the sink for processing.
 The sink has a low resolution view of the state of the entire sensor network.
-While this may not be enough for rigorous anomaly analysis, properly feature extracted data from every node should be enough to detect the occurrence of an anomaly.
+While this may not be enough for rigorous anomaly analysis and classification, properly feature extracted metrics from every node are enough to detect the occurrence of an anomaly.
 Finally if an anomaly is detected the sink requests high resolution data from all of the affected devices and their neighbors.
 
 \begin{figure}[h]
-	  \centering
-	  \includegraphics[width=0.5\linewidth]{img/edge_computing_vs.pdf}
-	\caption{Comparison of the three event detection methodology across three metrics.
-	Methods are as follows: naive method (2), self triggering (1), Napali, hybrid solution (3)}
-	\label{intro:fig:edge}
+    \centering
+    \includegraphics[width=0.5\linewidth]{img/edge_computing_vs.pdf}
+    \caption{Comparison of the three event detection methodology across three metrics.
+    Methods are as follows: naive method (2), self triggering (1), Napali, hybrid solution (3)}
+    \label{intro:fig:edge}
 \end{figure}
 The naive method provides the best detection ability and the smallest node computation requirement.
 However, it does so at the cost of the largest bandwidth consumption.
@@ -101,48 +101,48 @@ These low threshold events may be invaluable for reconstructing the dynamic of t
 
 Napali's hybrid approach provides the opportunity for much better anomaly detection rate and background noise rejection, by correlating the features that are computed on the sensor nodes.
 Napali has moderate bandwidth consumption, however the bandwidth consumption is tunable since the features can be computed for varied temporal windows length of which can be adjusted in real time.
-Napali does requires the highest sensor node computing power, since not only does it need to extract the triggering features from from raw data, it needs to maintain a buffer of sensor measurements to send to the sink if an anomaly is detected.
+Napali requires the highest sensor node computing power, since not only does it need to extract the triggering features from from raw data, it needs to maintain a buffer of sensor measurements to send to the sink if an anomaly is detected.
 
-The downside of the Napali framework, is the requirement for two way communication between the sink and the sensor node.
+The main operational downside of the Napali framework, is the requirement for two way communication between the sink and the sensor node.
 In order to participate in event detection Napali sensors need to be able to both send raw and feature extracted data, as well as receive the control signals from the sink.
 In contrast, the naive and self triggered approaches only require a one way link to send the raw data to the sink.
 As such, standalone devices can be retrofired to participate in distributed event detection in the naive and self triggered approaches, while Napali requires custom devices specifically tailored for cooperative event detection.
 
-I show that there are several benefits to the Napali method compared to the naive and self triggered approaches.
+The advantages of the Napali methodology compared to the naive and self triggered approaches are enumerated below:
 \begin{enumerate}
-	\item \textbf{Bandwidth usage is minimized:} Instead of sending the entirety of raw data, only extracted features are sent.
-	This features will have a tiny fraction of the bandwidth requirement when compared to raw waveforms.
-	Furthermore, the temporal window which encompasses a single feature can be adjusted in real time.
-	Thus as soon as an anomalous behavior is observed in a subset of sensors, this window can be adjusted for a finer grained feature extraction.
-  
-	\item \textbf{Effects of latency are minimized:} Even at 1Msample/second at 16bits of resolution, the memory requirement to store 5 minutes of raw waveform without compression are on the order of 512MB, which is well within the realm of cheap single board computers.
-	With compression specifically suited to the signal of interest, the memory requirement can be reduced even further.
-	This gives the triggering stream sink plenty of time to respond to the anomalies in the data and request raw waveform from the monitoring devices.
-  
-	\item \textbf{Sink processing requirements are minimized:} Since most of the feature extraction is already performed at the device level the triggering stream sink computational resources can be minimized.
-	With the advent of IOT, the computational capacity of the edge devices is quickly growing.
-	Napali exploits these resources, and thus minimizes the sink computational requirements.
-  
-	\item \textbf{Sub-threshold data acquisition:} The triggering stream sink makes the decision to acquire raw waveform from sensor nodes.
-	This allows researchers to collect data from devices which were only mildly affected or not affected by the disturbance.
-	This provides new possibilities for investigation of disturbance propagation across the sensed area.
-  
-	\item \textbf{Power failure resiliency:} In the case of the complete power failure or communication blackout, if the monitoring device has a battery backup capability, each sensor has a record of the entire raw waveform leading up to the power interruption.
-	Prior to shutdown the sensor node will transfer all of the raw data from the volatile memory to on-board permanent storage.
-	Once the power or communication channel is restored, select portions of the buffer may be sent back to the data sink.
-	This creates an additional layer of resiliency for the anomaly detection network.
-  
-	\item \textbf{Flexible Privacy:} Anomalies which were only observed at a single point are most likely local noise and pose little value for global state monitoring.
-	It's up to the user to decide how to process disturbances which affect their sensor.
-	For example user may choose to record a full waveform, only certain features, or record nothing at all.
-	Secondly, if the saturation of the device is high enough only a subset of them would need to send a triggering stream for event detection, while the rest will be used for acquiring raw waveform for small temporal regions containing global events.
-  
-  \item \textbf{Temporal Locality:} By exploiting the temporal locality it is possible to ascertain the geographical extent of the anomaly with only coarse features.
-  This allows for a simple robust algorithm which may be deployed at the sink node for anomaly detection.
+    \item \textbf{Bandwidth usage is minimized:} Instead of sending the entirety of raw data, only extracted features are sent.
+    This features will have a tiny fraction of the bandwidth requirement when compared to raw waveforms.
+    Furthermore, the temporal window which encompasses a single feature can be adjusted in real time.
+    Thus as soon as an anomalous behavior is observed in a subset of sensors, this window can be adjusted for a finer grained feature extraction.
+
+    \item \textbf{Effects of latency are minimized:} Even at 1Msample/second at 16bits of resolution, the memory requirement to store 5 minutes of raw waveform without compression are on the order of 512MB, which is well within the realm of cheap single board computers.
+    With compression specifically suited to the signal of interest, the memory requirement can be reduced even further.
+    This gives the triggering stream sink plenty of time to respond to the anomalies in the data and request raw waveform from the monitoring devices.
+
+    \item \textbf{Sink processing requirements are minimized:} Since most of the feature extraction is already performed at the device level the triggering stream sink computational resources can be minimized.
+    With the advent of IOT, the computational capacity of the edge devices is increasing.
+    Napali exploits these resources, and thus minimizes the sink computational requirements.
+
+    \item \textbf{Sub-threshold data acquisition:} The triggering stream sink makes the decision to acquire raw waveform from sensor nodes.
+    This allows researchers to collect data from devices which were only mildly affected or not affected by the disturbance.
+    This provides new possibilities for investigation of disturbance propagation across the sensed area.
+
+    \item \textbf{Power failure resiliency:} In the case of the complete power failure or communication blackout, if the monitoring device has a battery backup capability, each sensor has a record of the entire raw waveform leading up to the power interruption.
+    Prior to shutdown the sensor node will transfer all of the raw data from the volatile memory to on-board permanent storage.
+    Once the power or communication channel is restored, select portions of the buffer may be sent back to the data sink.
+    This creates an additional layer of resiliency for the anomaly detection network.
+
+    \item \textbf{Flexible Privacy:} Anomalies which were only observed at a single point are most likely local noise and pose little value for global state monitoring.
+    It's up to the user to decide how to process disturbances which affect their sensor.
+    For example user may choose to record a full waveform, only certain features, or record nothing at all.
+    Secondly, if the saturation of the device is high enough only a subset of them would need to send a triggering stream for event detection, while the rest will be used for acquiring raw waveform for small temporal regions containing global events.
+
+    \item \textbf{Temporal Locality:} By exploiting the temporal locality it is possible to ascertain the geographical extent of the anomaly with only coarse features.
+    This allows for a simple robust algorithm which may be deployed at the sink node for anomaly detection.
 \end{enumerate}
 
 \section{The problem of power quality} \label{intro:sec:pq}
-Power quality monitoring along with other smart grid domains is a field well suited for distributed sensor network monitoring.\cite{liu2017distribution} \cite{peisert2017lbnl} As the power grid moves from centralized generation with a few centralized power plants to distributed generation with residential power production, a distributed  consumer level monitoring system becomes ever more important.
+Power quality monitoring along with other smart grid domains is a field well suited for distributed sensor network monitoring.\cite{liu2017distribution} \cite{peisert2017lbnl} As the power grid moves from centralized generation with a few centralized power plants to distributed generation with residential power production, a distributed consumer level monitoring system becomes ever more important.
 Traditionally utilities do not monitor the quality of power besides the consumption beyond the substation level.
 This is due to the fact that the last opportunity that the utility has to regulate and filter the grid voltage in the hierarchical power distribution is at the substation, or neighborhood level.
 This methodology is unsustainable, as residential renewable energy production if not properly monitored and controlled will have an adverse effect on the overall grid stability.
@@ -154,38 +154,38 @@ Small interruptions, and partial interruptions such as voltage sags, swells, fre
 It is in the best interest of the consumers to monitor the quality of the power that is delivered to them, meanwhile the same same monitoring system will also allows researchers and utilities to monitor the entirety of smart grid.
 
 \begin{figure}[h]
-	\centering
-	\begin{subfigure}{.5\textwidth}
-	  \centering
-	  \includegraphics[width=0.9\linewidth]{img/hotplate.png}
-	  \caption{Voltage signal produced by a hotplate.}
-	  \label{intro:fig1:sub1}
-	\end{subfigure}%
-	\begin{subfigure}{.5\textwidth}
-	  \centering
-	  \includegraphics[width=0.9\linewidth]{img/PC.png}
-	  \caption{Voltage signal produced by a desktop PC running a complex task}
-	  \label{intro:fig1:sub2}
-	\end{subfigure}
-	
-	\begin{subfigure}{1\textwidth}
-	  \centering
-	  \includegraphics[width=0.9\linewidth]{img/johnson_daily.png}
-	  \caption{Line voltage recorded over 24 hours in a residential household with photovoltaic installation.}
-	  \label{intro:fig1:sub3}
-	\end{subfigure}
-	
-	\caption{RMS voltage waveform generated form the consumer side of the meter under various conditions.
-	All waveform were recorded using the OPQ Box 2.}
-	\label{intro:fig:1}
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{img/hotplate.png}
+        \caption{Voltage signal produced by a hotplate.}
+        \label{intro:fig1:sub1}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{img/PC.png}
+        \caption{Voltage signal produced by a desktop PC running a complex task}
+        \label{intro:fig1:sub2}
+    \end{subfigure}
+
+    \begin{subfigure}{1\textwidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{img/johnson_daily.png}
+        \caption{Line voltage recorded over 24 hours in a residential household with photovoltaic installation.}
+        \label{intro:fig1:sub3}
+    \end{subfigure}
+
+    \caption{RMS voltage waveform generated form the consumer side of the meter under various conditions.
+    All waveform were recorded using the OPQ Box 2.}
+    \label{intro:fig:1}
 \end{figure}
 
 Residential power quality monitoring presents a number of issues.
 First of all, it is difficult to discern which side of the utility meter a power disturbance came from.
 Consider a voltage sag generated by a 1kW hot plate shown in Figure \ref{intro:fig1:sub1}.
- Since the output impedance of the power grid is non-zero a high powered device can cause a significant voltage sag affecting every device connected to the same circuit.
- Secondly, recoding the voltage waveform resulting from non linear load can result in privacy leaks for the end user.
- Consider the voltage waveform produced by a PC running a video game as shown in Figure \ref{intro:fig1:sub2}.
+Since the output impedance of the power grid is non-zero a high powered device can cause a significant voltage sag affecting every device connected to the same circuit.
+Secondly, recoding the voltage waveform resulting from non linear load can result in privacy leaks for the end user.
+Consider the voltage waveform produced by a PC running a video game as shown in Figure \ref{intro:fig1:sub2}.
 Throughout the game loading process the power load varies based on which components are in use.
 Furthermore, regions with CPU load, harddisk load and video card load can be readily identified by measuring the resulting voltage sag.
 Recording these event's has an adverse effect on end-users privacy and offers no immediate benefit in studying grid stability.
@@ -243,10 +243,10 @@ If a third device is introduced, it is highly unlikely that all 3 would observe 
 This implies that combination of temporal and threshold based correlation on the feature extraction data would allow one to build a robust residential based power grid monitoring system which would yield a very low rate of false positives.
 
 \begin{figure}[h]
-	\centering
-	  \includegraphics[width=0.9\linewidth]{img/grid_hierarchy_cartoon.pdf}
-	  \caption{Power quality anomaly propagation example.}
-	  \label{intro:fig2}
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/grid_hierarchy_cartoon.pdf}
+    \caption{Power quality anomaly propagation example.}
+    \label{intro:fig2}
 \end{figure}
 
 \section{Thesis claim and evaluation} \label{intro:sec:claim}
@@ -254,17 +254,17 @@ This implies that combination of temporal and threshold based correlation on the
 Today's big data world is plagued with the issues of data cleaning and validation, even though it's being relied on for timely, accurate and actionable intelligence.
 With large ingress of unstructured data these issues are unavoidable, and preprocessing will remain a large portion of the analysis workload.
 However, in the case of sensor networks designed for a specific purpose, the tasks of anomaly detection can be pushed to the edge of the network using the Napali methodology.
-The claim of this thesis is that Napali provides novel architecture that is both a feasible solution to the problem of distributed power quality monitoring and which also provides significant benefits over the two standard alternative architectures (all computation/storage at nodes, all computation/storage at the sink).
+The claim of this thesis is that Napali provides novel architecture that is both a feasible solution to the problem of distributed power quality monitoring and significant benefits over the two standard alternative architectures (all computation/storage at nodes, all computation/storage at the sink).
 
-To evaluate the feasibility of the Napali framework, I propose to implement it as part of the Open Power Quality(OPQ) system and apply it to the problems of power quality monitoring.
+To evaluate the merit of the Napali framework, I implemented it as part of the Open Power Quality(OPQ) system and apply it to the problems of power quality monitoring.
 Combined with higher level anomaly analysis, Napali provides important services for a Open Power Quality power quality monitoring network.
 This network is made up of a group of monitoring devices as well as a centralized data sink server.
-This system will be deployed for testing at the University of Hawaii at Manoa campus, by deploying power quality monitors across at least 20 buildings on campus.
+This system was deployed for testing at the University of Hawaii at Manoa campus, by deploying power quality monitors across 15 University buildings.
 The University of Hawaii at Manoa campus is a unique testbed for such a network, since entire campus is isolated to its own microgrid, connected to the municipal Oahu grid via a 46kV feeder.
-Furthermore, the University of Hawaii has deployed a set of smart power monitors at the key positions in the grid, which can be used as a state of the art ground truth for evaluation of OPQ performance.
+Furthermore, the University of Hawaii has deployed a set of smart power monitors at the key positions in the grid, which was used as a state of the art ground truth for evaluation of OPQ performance.
 
 
-The system relies on a custom residential power quality monitor called OPQ Box, designed specifically for distributed monitoring using the Napali framework.
+OPQ system relies on a custom residential power quality monitor called OPQ Box, designed specifically for distributed monitoring using the Napali framework.
 Instead of performing local analysis on the voltage waveform with the aim of PQ anomaly detection, or forwarding all the recording measurements to the centralized sink, OPQ boxes computes a small subset of features on the input voltage waveform.
 These features are then forwarded to the Napali framework's centralized sink which performs the anomaly detection on reduced data, while the raw waveform is retained for a short time on the OPQ Box.
 If the sink determines that a possible anomaly has occurred, a request is sent to the affected and nearby devices for raw data.
@@ -284,41 +284,42 @@ Thus, monitoring of the leaf edges of the power delivery system can in principle
 
 The Open Power Quality system is designed to be a test bed for development of new power quality detection and analysis algorithms.
 Its introduction will facilitate development of new techniques and methods for studying power system, by utilizing the Napali framework as the main anomaly detection methodology.
-To evaluate the benefits of this architecture, I will assess the data collected by the OPQ network at the University of Hawaii in order to determine if the claimed benefits of the architecture are observed in practice.
+To evaluate the benefits of this architecture, I assessed the data collected by the OPQ network at the University of Hawaii in order to determine if the claimed benefits of the architecture are observed in practice.
 The description of the evaluation processes for the benefits described in Section \ref{intro:section:napali} are summarized below.
 
 \begin{enumerate}
-  \item \textbf{Bandwidth usage is minimized:} Bandwidth consumption of the OPQ system will be carefully monitored, recorded and compared to the bandwidth required to transmit the equivalent amount of raw data.
-  A more detailed description of this evaluation can be found in Section \ref{iexp:sec:band}.
-    
-	\item \textbf{Effects of latency are minimized:}  Latency limits of the triggering system will be examined.
-	Since these are heavily dependent on the raw data storage ability of the OPQ Box, latency effects will be tested under various amount of memory allocated for this task.
-	A more detailed description of this evaluation can be found in Section \ref{iexp:sec:lat}.
-  
-  \item \textbf{Temporal locality:} Data acquired from the UH building level meters will be compared with the data acquired via the Napali triggering framework.
-   This will allow me to establish the rate of false positives and negatives and evaluate the temporal locality triggering algorithm.
-   Furthermore, the single location events, which are normally rejected by Napali will also be examined and compared to the data provided by the building power meters.
-   A more detailed description of this evaluation can be found in Section \ref{iexp:sec:loc}.
+    \item \textbf{Bandwidth usage is minimized:} Bandwidth consumption of the OPQ system was be carefully monitored, recorded and compared to the bandwidth required to transmit the equivalent amount of raw data.
+    A more detailed description of this evaluation can be found in Section \ref{iexp:sec:band}.
 
-  \item \textbf{Sink processing requirements are minimized:} Synthetic benchmarks will be carried out on the sink node to determine the scalability of the triggering system.
-  These scalability metrics will be compared with a synthetic benchmark of running multiple copies of the OPQ Box analysis software on the same node.
-  This will allow me to compare the scalability of the sink node in the case of sending the entirety of raw data stream versus the Napali frameworks approach of only sending extracted metrics.
-  A more detailed description of this evaluation can be found in Section \ref{iexp:sec:scale}.
+    \item \textbf{Effects of latency are minimized:}  Latency limits of the triggering system were examined.
+    Since these limits are heavily dependent on the raw data storage ability of the OPQ Box, latency effects were tested under various amount of memory allocated for this task.
+    A more detailed description of this evaluation can be found in Section \ref{iexp:sec:lat}.
 
-	\item \textbf{Sub-threshold data acquisition:} Evaluation of the sub-threshold data acquisition will performed in two ways.
-	First, the triggering stream from the OPQ Boxes will be stored along with the acquired raw data.
-	The triggering stream can be used to compute which fraction of devices would have self triggered if operating autonomously.
-	Next the building level meters self triggering capabilities, will be compared to the Napali, sub-threshold triggering in order to compare Napali to a commercially deployed system.
-	A more detailed description of this evaluation can be found in Section \ref{iexp:sec:sub}.
-  
+    \item \textbf{Temporal locality:} Data acquired from the UH building level meters was compared with the data acquired via the Napali triggering framework.
+    This allowed me to establish the rate of false positives and negatives and evaluate the temporal locality triggering algorithm.
+    Furthermore, the single location events, which are normally rejected by Napali were also be examined and compared to the data provided by the building power meters.
+    A more detailed description of this evaluation can be found in Section \ref{iexp:sec:loc}.
+
+    \item \textbf{Sink processing requirements are minimized:} Synthetic benchmarks were carried out on the sink node to determine the scalability of the triggering system.
+    These scalability metrics were compared with a synthetic benchmark of running multiple copies of the OPQ Box analysis software on the same node.
+    This allowed me to compare the scalability of the sink node in the case of sending the entirety of raw data stream versus the Napali frameworks approach of only sending extracted metrics.
+    A more detailed description of this evaluation can be found in Section \ref{iexp:sec:scale}.
+
+    \item \textbf{Sub-threshold data acquisition:} Evaluation of the sub-threshold data acquisition was accomplished in two steps.
+    First, the triggering stream from the OPQ Boxes was stored along with the acquired raw data.
+    The triggering stream was used to compute which fraction of devices would have self triggered if operating autonomously.
+    Next the building level meters self triggering capabilities, were compared to the Napali sub-threshold triggering.
+    This provided a baseline comparison of Napali with a commercially deployed system.
+    A more detailed description of this evaluation can be found in Section \ref{iexp:sec:sub}.
+
 \end{enumerate}
-Although power failure resiliency and flexible privacy are claimed benefits of the Napali architecture, they will not be evaluated as part of this thesis research.
-Flexible privacy would require a much larger deployment, and a user study, which is beyond the scope of this project.
+Although power failure resiliency and flexible privacy are claimed benefits of the Napali architecture, they were not evaluated as part of this thesis research.
+Flexible privacy required a much larger deployment, and a user study, which was beyond the scope of this project.
 Furthermore the power failure resilience of the Napali framework would require a significant development effort in development of the battery management system.
-Since complete power failures are quite rare, there is no guarantee that a single power outage would occur at the UH campus during the deployment.
+Since complete power failures are quite rare, there is no guarantee that a single power outage would occur on the UH campus during the deployment.
 
 
 The last claim of this dissertation is that the Napali architecture can be applied to other domains.
-Once the Napali framework is fully characterized, and its strengths and weaknesses are well understood, I intend to perform an in-depth literature review of other domains which could benefit from Napali-like approach to event detection.
-I will also characterize the kinds of design changes to existing sensors that the Napali Framework will require in order to apply it to these domains.
+Once the Napali framework was fully characterized, and its strengths and weaknesses were well understood, I performed an in-depth literature review of other domains which could benefit from Napali-like approach to event detection.
+I further characterized the kinds of design changes to existing sensors that the Napali Framework required in order to apply it to these domains.
 
