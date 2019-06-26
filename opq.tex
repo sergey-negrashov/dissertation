@@ -40,18 +40,18 @@ A complete device in an acrylic enclosure is shown in Figure~\ref{fig:opq:1:2}.
 	  \caption{OPQ Box2 in an acrylic enclosure.}
 	  \label{fig:opq:1:2}
 	\end{subfigure}
-	\caption{(a) OPQ Box2 block diagram and (b) production OPQ box ready for deployment}
+	\caption{(a) OPQ Box2 block diagram and (b) production OPQ Box ready for deployment}
 	\label{fig:opq:2}
 \end{figure}
 
 \subsection{Hardware}\label{subsec:hardware}
 
-The power system of the OPQ box2 electrically isolates most of the device from the AC mains power.
+The power system of the OPQ Box2 electrically isolates most of the device from the AC mains power.
 An isolated AC-DC converter generates $5V_{dc}$ from the mains $120V_{ac}$.
 5V is used to power the Raspberry Pi, equipment connected to the expansion port, 3.3V regulators and voltage reference and an isolated DC/DC converter.
 3.3V is used to power the isolated end of the isolation amplifier as well as the STM32F3 analog to digital converter/digital signal processor (ADC/DSP).
 The hot side of the isolation amplifier is powered from the isolated DC/DC converter.
-This allows OPQ box to function with the battery attached to the expansion port, so that it may retain data and continue to operate during a power outage.
+This allows OPQ Box to function with the battery attached to the expansion port, so that it may retain data and continue to operate during a power outage.
 
 
 The analog signal path of the OPQ Box2 is complicated by the fact that the STM32F3 ADC/DSP is electrically isolated from the mains power.
@@ -83,7 +83,7 @@ The software stack of the Raspberry Pi aims to deliver a full featured power qua
 A block diagram of the software stack is shown in Figure~\ref{fig:opq:3}.
 Digital data is transferred from the DSP to the Raspberry Pi via Serial Peripheral Interface, with the Pi acting as the master and the DSP as a slave device.
 A hardware interrupt line is used to inform Pi software that the DSP is ready for the data transfer.
-During the initial design of the OPQ box 2 software, SPI data transfer was attempted in userland.
+During the initial design of the OPQ Box 2 software, SPI data transfer was attempted in userland.
 However due to the lack of support for DMA in the SPI kernel-to-userland bridge, a large portion of the CPU time was spent facilitating data transfer, resulting in degraded analysis performance as well as missed data samples.
 Current revision of the OPQ Box 2 software stack utilizes a kernel driver for management of SPI bus.
 Internally OPQ driver maintains a ring buffer of 16 windows each 200 data samples in size.
@@ -148,7 +148,7 @@ Since a sinusoid has two zero crossings for a full cycle the frequency can be ca
 \end{figure}
 
 Where the $\Delta t_{k}$ is the k'th time between two adjacent zero crossings.
-In order to improve the accuracy of the frequency calculation one must first filter out as much of out of band noise as possible.
+In order to improve the accuracy of the frequency calculation one must first filter out as much noise as possible.
 Since our sampling rate is quite high (12kSps) and the fundamental frequency is quite low (60Hz) it is very computationally expensive to perform this filtering in a single step.
 Instead filtering is accomplished via a set of two finite impulse response (FIR) filters shown in Figure~\ref{fig:opq:4:2} and~\ref{fig:opq:4:4}.
 First the Down sampling filter is applied to the raw waveform, which results in the frequency response shown in Figure~\ref{fig:opq:4:1}.
@@ -182,7 +182,7 @@ Instead OPQ Box 2 computes $V_{rms}$ as follows:
 	V_{rms} = \sqrt{\frac{1}{n}\sum\limits_{k=0}^{k=n}V_{k}^{2}}
 \end{equation}
 Similarly to the frequency calculation OPQ Box 2 usees a 10 cycle window for a single $V_{rms}$ calculation, however unlike the frequency calculation the input is not filtered a priori.
-An example of a power quality disturbance which exhibits low $V_{rms}$ is shown in Figure~\ref{fig:opq:6:1} and~\ref{figopq:6:2}.
+An example of a power quality disturbance which exhibits low $V_{rms}$ is shown in Figure~\ref{fig:opq:6:1} and~\ref{fig:opq:6:2}.
 These disturbances are the result of a lighting strike recorded by two OPQ Box 2 devices on Nov 1, 2017.
 
 \begin{figure}[h]
@@ -205,37 +205,37 @@ These disturbances are the result of a lighting strike recorded by two OPQ Box 2
 
 
 \subsection{Total Harmonic Distortion}\label{subsec:thd}
-OPQBox calculates THD using industry standard methodology.
+OPQ Box calculates THD using industry standard methodology.
 In the power delivery industry THD is defined as:
 \begin{equation} \label{eq:4}
 THD = \frac{\sqrt{\sum{V_{n}^2}}}{V_{f}}*100\%
 \end{equation}
 Where $V_{f}$ is the fundamental 60Hz power and $V_{n}$ is the power at $n^{th}$ harmonic.
 It should be noted that in the power quality domain THD is expressed as a percentage as opposed to $\frac{dB}{\sqrt{Hz}}$ as used in other disciplines.
-Operationally, OPQBox computes THD for 10 cycles of the fundamental frequency.
+Operationally, OPQ Box computes THD for 10 cycles of the fundamental frequency.
 First an FFT transforms the real voltage samples into it's frequency components.
 Next, the square of the harmonic bins is accumulated and scaled by the magnitude of the fundamental power.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=1\linewidth]{img/thd_two_devices_24_hours.png}
-	\caption{A common THD trend across two OPQBox devices each deployed in the two Flexible Response to Ongoing Growth buildings on UH campus.}
+	\caption{A common THD trend across two OPQ Box devices each deployed in the two Flexible Response to Ongoing Growth buildings on UH campus.}
 	\label{fig:opq:7}
 \end{figure}
 
-Figure~\ref{fig:opq:7} shows a common trend observed by all OPQBox devices installed on the UH campus.
+Figure~\ref{fig:opq:7} shows a common trend observed by all OPQ Box devices installed on the UH campus.
 For clarity only two devices are shown.
 It is assumed that the large drop observed daily from approximately 6am to 6pm corresponds to the automatic response of the power delivery system to the reactive power in the grid, by deploying a large capacitor bank to compensate for the current phase lag.
 
 \subsection{Transient Detection}\label{subsec:transient-detection}
 
-OPQBox transient detection is performed via filtering out of the fundamental frequency via an FIR high pass pass filter and searching for a maximum value in the remainder.
+OPQ Box transient detection is performed via filtering out of the fundamental frequency via an FIR high pass pass filter and searching for a maximum value in the remainder.
 The high pass filter has a cutoff of $400Hz$, and the filter coefficients and response are shown in Figure~\ref{fig:opq:8:2} and Figure~\ref{fig:opq:8:1} respectively.
 The result of the high pass filter operation is shown in Figure~\ref{fig:opq:8}.
-Figure~\ref{fig:opq:8:3} shows a synthetic signal generated via a SDG1025 signal generator and fed into the OPQBox.
+Figure~\ref{fig:opq:8:3} shows a synthetic signal generated via a SDG1025 signal generator and fed into the OPQ Box.
 This signal contains a $5V_{pp}$ transient injected at 11ms.
 Filtered signal is shown in Figure~\ref{fig:opq:8:4}, with the fundamental removed and the transient preserved.
-OPQBox scans for the highest sample in the filtered waveform and uses its magnitude as a transient detection metric.
+OPQ Box scans for the highest sample in the filtered waveform and uses its magnitude as a transient detection metric.
 
 
 \begin{figure}[h]
@@ -287,9 +287,9 @@ A small transient of approximately 1.6V was observed occurring at 2600s, while t
 
 Computed fundamental frequency and $V_{rms}$ are transmitted to the Makai service for aggregation.
 Data transmission is handled using 0MQ software stack with Curve25519 elliptic curve encryption.
-Each device holds a unique of private and public keys, as well as the servers public key, allowing both the Makai service and the OPQ Box 2 to verify it's peer.
+Each device holds a unique private and public key, as well as the servers public key, allowing both the Makai service and the OPQ Box 2 to verify it's peer.
 Internally metrics transmission uses 0MQ's PUB/SUB protocol.
-This protocol is a publish subscribe one to many topology, with each message containing the topic, and a payload.
+This protocol is a publish subscribe topology, with each message containing the topic, and a payload.
 Additionally 0MQ pub-sub topology allows for multiple sub peers with subscriptions forwarder to the publisher automatically via a side channel.
 This allows for the aggregation service to be spread across multiple nodes, with minimal network overhead.
 
@@ -300,7 +300,7 @@ Protobuf message serialization is used to encode messages across the OPQ ecosyst
 
 In order to make a distributed measurement, all of the OPQ Boxes on the OPQ network need to maintain an accurate time reference.
 Time synchronization across multiple OPQ Boxes is accomplished using the Network Time Protocol.
-The expansion port of the OPQ Box 2 supports a GPS receiver, however using it is detrimental to the OPQ Box 2 utility.
+The expansion port of the OPQ Box 2 supports a GPS receiver.
 GPS receivers require line of sight to the sky, and since the with out on-board real-time clock, every power interruption requires a GPS cold start.
 NTP performance has been verified against GPS resulting in time error of $8ms\pm 5ms$ which is typical for NTP running over the Internet with a close by NTP server.
 This error is visualized in a Figure~\ref{fig:opq:6:2}.
@@ -325,9 +325,9 @@ OPQ Makai implements the Napali Framework requirements for a ``sink''.
 The triggering Broker is perhaps the simplest component of the OPQ Makai system.
 The triggering stream generated by the OPQ Boxes is encrypted to preserve users privacy.
 In order to minimize the CPU time spent decrypting the data across multiple OPQ services, the Triggering Broker is used to decrypt the data and send clear text measurements across the rest of the OPQ ecosystem.
-Triggering Broker uses the 0mq sub socket to receive data form OPQ Boxes, and send, it via a pup socket to any connected client.
+Triggering Broker uses the 0mq subscribe socket to receive data form OPQ Boxes, and send, it via a publish socket to any connected client.
 Another potential role of the Triggering Broker is load balancing.
-Since the 0MQ pub/sub sockets are subscription based, services connecting to the triggering broker can selectively receive measurements only from OPQ Boxes they are interested in.
+Since the 0MQ pub/sub sockets are subscription-based, services connecting to the triggering broker can selectively receive measurements only from OPQ Boxes they are interested in.
 
 \subsection{Acquisition Broker}\label{subsec:acquisition-broker}
 
