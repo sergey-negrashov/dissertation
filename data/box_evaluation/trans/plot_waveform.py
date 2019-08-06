@@ -11,9 +11,6 @@ data = [];
 i = 0
 
 for line in content:
-    if i < 250:
-        i += 1
-        continue
     try:
         data.append(float(line))
     except ValueError:
@@ -26,7 +23,7 @@ print(len(data))
 timestep = 1/60.0/200.0
 
 x = []
-for i in range(0,200):
+for i in range(0,len(data)):
 	x.append(i*timestep*1000)
 
 fig, axs = plt.subplots(1, 1, sharey=True, tight_layout=True)

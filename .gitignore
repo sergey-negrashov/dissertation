@@ -5,7 +5,6 @@
 *.log
 *.lot
 *.out
-*.pdf
 *.gz
 *.toc
 build/
