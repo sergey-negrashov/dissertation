@@ -66,7 +66,7 @@ The input and output of the isolation amplifier is filtered with a passive first
 Isolated signal is then digitized via a 16bit ADC of the STM32F3 DSP at $12 KSps$, which gives 200 data samples per grid cycle.
 Internally digitization process runs asynchronously with the respect to the the DSP CPU, in order to minimize timing jitter.
 It was verified that the sampling jitter of the ADC is less then 1us, however due to limited precision of equipment an exact figure was not established.
-Data stream in its digital form is transfered to the Raspberry Pi single board computer (SBC) for analysis.
+Data stream in its digital form is transferred to the Raspberry Pi single board computer (SBC) for analysis.
 
 \begin{figure}[h]
   \begin{center}
@@ -95,7 +95,7 @@ Thus the smallest window that a userland application may process is a single AC 
 Userland component of the OPQ Box 2 software is a multi-threaded extensible analysis framework called Triggering.
 The reader thread is responsible for transferring and accumulating data from the kernel driver.
 The smallest data buffer that the Triggering application processes at any given time is 10 grid cycles or 2k samples.
-Once the cycles are transfered to the userland and timestamped, they are passed to the analysis thread for feature extraction, as well as to the Raw Data Ring Buffer (RDRB).
+Once the cycles are transferred to the userland and timestamped, they are passed to the analysis thread for feature extraction, as well as to the Raw Data Ring Buffer (RDRB).
 Since internally all data is addressed using shared pointers, during data duplication no copying is required.
 RDRS is capable of buffering up to an hour of historic data before it's overwritten resulting in the RDBS maximum size of 100MB.
 
@@ -391,7 +391,7 @@ All commands between services downstream of the Acquisition Broker and OPQ Boxes
 			\arrayrulecolor{black}\hline
 			\textbf{timestamp\_ms} & \textit{uint64} & Millisecond timestamp, created on command issue.\\
 			\arrayrulecolor{black}\hline
-			\textbf{identity} & \textit{String} & Identity of the sender.\\
+			\textbf{identity} & \textit{string} & Identity of the sender.\\
 			\arrayrulecolor{black}\hline
 			\textbf{command} & \textit{Command} & Command payload.\\
 			& &\\
@@ -509,9 +509,9 @@ Utilities which query all available devices, such as a periodic health check ser
 			\arrayrulecolor{black}\hline
 			\textbf{calibration\_constant} & \textit{f32} & Calibration constant for the device.\\
 			\arrayrulecolor{black}\hline
-			\textbf{pub\_key} & \textit{String} & Byte64 encoded public key of the device.\\
+			\textbf{pub\_key} & \textit{string} & Byte64 encoded public key of the device.\\
 			\arrayrulecolor{black}\hline
-			\textbf{measurement\_rate} & \textit{String} & How often a triggering message is produced.\\
+			\textbf{measurement\_rate} & \textit{string} & How often a triggering message is produced.\\
 
 			& &\\
 			\arrayrulecolor{green}\hline
@@ -555,7 +555,7 @@ Utilities which query all available devices, such as a periodic health check ser
 			\arrayrulecolor{black}\hline
 			\textbf{code} & \textit{uint32} & Error Code.\\
 			\arrayrulecolor{black}\hline
-			\textbf{Error} & \textit{String} & Human readable error string.\\
+			\textbf{Error} & \textit{string} & Human readable error string.\\
 		\end{tabularx}
 	\end{table}
 \end{center}
@@ -563,7 +563,13 @@ Utilities which query all available devices, such as a periodic health check ser
 \subsection{Acquisition Service}\label{subsec:acquisition-service}
 
 The Acquisition Service middleware resides in between the Triggering and Acquisition Brokers.
-
+Acquisition Service is responsible for the following tasks:
+\begin{enumerate}
+	\item Computation of statistics of the incoming triggering stream.
+	\item Hosting plugins for triggering stream analysis.
+	\item Generating data event requests for OPQ Boxes.
+\end{enumerate}
+A block diagram of the Acquisition Service is shown in Figure \ref{fig:opq:makai_aqs}.
 \begin{figure}[h]
 	\begin{center}
 		\includegraphics[width=0.6\textwidth]{img/makai_aqs.pdf}
@@ -571,6 +577,256 @@ The Acquisition Service middleware resides in between the Triggering and Acquisi
 	\caption{Block diagram of the Acquisition Service.}
 	\label{fig:opq:makai_aqs}
 \end{figure}
+
+\subsubsection{Triggering Stream Statistics.}
+
+Acquisition Service accesses the triggering stream by connecting to the publish socket of the Triggering broker.
+Since the connection is managed through the 0MQ publish-subscribe socket, several Acquisition Services can be connected to a single Triggering broker endpoint each servicing a subset of OPQ Boxes by subscribing to only specific devices.
+This functionality is used to manage devices that the OPQ project sends to the mainland for evaluation by organisations interested in the project.
+These loner devices participate in their own triggering schemes, and do not contaminate the triggering stream with messages about an unconnected grid.
+
+Triggering messages received by the Acquisition service are buffered and stored in the mongo database.
+There are two types of statistics accumulated by the Acquisition Service:
+\begin{enumerate}
+	\item \textit{Measurements:} Every triggering stream message gets converted to a set measurement.
+	\item \textit{Trends:} One minute window of triggering stream messages get feature extracted and stored.
+\end{enumerate}
+
+Measurements have a one to one relationship with a triggering messages and take form of mongo documents described in Table \ref{tbl:opq:measurement_db}.
+Measurement documents have an expire\_at field that instructs Mongo to clean up the measurement collection after after a predetermined time period.
+Currently measurement documents persist for 24 hours.
+\begin{center}
+	\begin{table}[!ht]
+		\caption{Measurement Document.}
+		\label{tbl:opq:measurement_db}
+		\begin{tabularx}{\textwidth}[t]{ssb}
+			\textbf{Field} & \textbf{Type} & \textbf{Description} \\
+			\arrayrulecolor{black}\hline
+			\textbf{box\_id} & \textit{string} & OPQ Box ID.\\
+			\arrayrulecolor{black}\hline
+			\textbf{timestamp\_ms} & \textit{uint64} & Millisecond timestamp.\\
+			\arrayrulecolor{black}\hline
+			\textbf{voltage} & \textit{f32} & $V_{rms}$ average value.\\
+			\arrayrulecolor{black}\hline
+			\textbf{thd} & \textit{f32} & THD average value\\
+			\arrayrulecolor{black}\hline
+			\textbf{frequency} & \textit{f32} & Frequency average value\\
+			\arrayrulecolor{black}\hline
+			\textbf{expire\_at} & \textit{f32} & Deletion time for the measurement.\\
+		\end{tabularx}
+	\end{table}
+\end{center}
+
+Trends consist of feature extracted statistics accumulated from 1 minute of triggering measurements
+The statistic computed are minimum, maximum and average for each box metric.
+Similarly to the Measurement documents, Trend documents expire after a predeterminned period of time.
+Currently trends are retained for 7 days.
+Structure of a Trend document is shown in Table \ref{tbl:opq:trend_db}.
+
+\begin{center}
+	\begin{table}[!ht]
+		\caption{Trend Document.}
+		\label{tbl:opq:trend_db}
+		\begin{tabularx}{\textwidth}[t]{ssb}
+			\arrayrulecolor{green}\hline
+			\textbf{\textcolor{myGreen}{Trend Document}} & &\\
+			\hline
+			\textbf{Field} & \textbf{Type} & \textbf{Description} \\
+			\arrayrulecolor{black}\hline
+			\textbf{box\_id} & \textit{string} & OPQ Box ID.\\
+			\arrayrulecolor{black}\hline
+			\textbf{timestamp\_ms} & \textit{uint64} & Millisecond timestamp.\\
+			\arrayrulecolor{black}\hline
+			\textbf{voltage} & \textit{Statistics} & $V_{rms}$ average value.\\
+			\arrayrulecolor{black}\hline
+			\textbf{thd} & \textit{Statistics} & THD average value\\
+			\arrayrulecolor{black}\hline
+			\textbf{frequency} & \textit{Statistics} & Frequency average value\\
+			\arrayrulecolor{black}\hline
+			\textbf{expire\_at} & \textit{u64} & Deletion time for the measurement.\\
+			& & \\
+			\arrayrulecolor{green}\hline
+			\textbf{\textcolor{myGreen}{Statistics}} & &\\
+			\hline
+			\textbf{Field} & \textbf{Type} & \textbf{Description} \\
+			\arrayrulecolor{black}\hline
+			\textbf{Min} & \textit{f32} & Minimum observed during the trend window.\\
+			\arrayrulecolor{black}\hline
+			\textbf{Max} & \textit{f32} & Maximum observed during the trend window.\\
+			\arrayrulecolor{black}\hline
+			\textbf{Average} & \textit{f32} & Average computed over the trend window.\\
+			\arrayrulecolor{black}\hline
+		\end{tabularx}
+	\end{table}
+\end{center}
+
+\subsubsection{Triggering Analysis infrastructure.}
+
+Acquisition Service does not include any analysis capabilities out of the box.
+Instead analysis is performed by shared library loadable plugins.
+These plugins can be loaded and unloaded at runtime, thus allowing live upgrading and testing of new analysis methods.
+Plugin are loaded using libdl by searching for C function hooks which produce a Rust structure which implements a plugin interface.
+The interface as well as the prototype C hook function are shown below:
+
+\begin{lstlisting}[language=Rust, style=colouredRust]
+pub trait MakaiPlugin: Any {
+  fn name(&self) -> &'static str;
+  fn process_measurement(&mut self, msg: Arc<Measurement>)->Option<Vec<Command>>;
+  fn on_plugin_load(&mut self, json: String);
+  fn on_plugin_unload(&mut self);
+}
+#[no_mangle]
+pub extern "C" fn _plugin_create() -> *mut MakaiPlugin;
+
+#[no_mangle]
+pub extern "C" fn _plugin_destroy(plg : *mut MakaiPlugin);
+\end{lstlisting}
+
+The $\_plugin\_create$ function is marked as $no\_mangle$ which instructs the compiler to retain the function name so it can be located by the plugin loader.
+It returns a mutable pointer to a boxed type which implements the MakaiPlugin interface.
+Since Rust is a explicit memory management language and the runtime is not aware of the internal structure of the Boxed type beyond it's interface a helper function $\_plugin_destroy$
+is used to cleanup the plugin object during the unloading process.
+Each plugin runs in a separate thread with a synchronized queue from which it draws measurement messages.
+If a plugins is not able to keep up with the triggering stream, Acquisition service will start dropping messages from it's input queue, and a message indicating this will be stored in the log.
+Once a plugin is loaded it will receive it's settings in form a of a json encoded string using the $on\_plugin\_load$ method.
+This allows it to initialize all of the internal data structures to a known state.
+Similarly $on\_plugin\_unload$ method is used to inform the plugin that it will be immanently unloaded.
+
+The processing of the triggering stream occurs in the $process\_measurement$ method.
+This methods takes a reference counted Measurement message in form shown in Table \ref{tbl:opq:trg_struct}.
+The return of this method is an optional list of commands to forward to the Acquisition broker in form shown in Table \ref{tbl:opq:cmd_struct}.
+All of the Commands in the list are treated to be pertaining to the same event.
+
+\subsubsection{Event Request.}
+Once a plugin determines that an event of interest has taken place, it will emit a list of \textbf{RD} commands with structure shown in Table \ref{tbl:opq:cmd_payload}.
+Event requester will fill in the identity field with the following string:
+\[ identity = ``data\_" + EVENT\_TOKEN +"\_" + ACQ\_UUID\]
+
+The ``$data\_$" prefix is used to route the messages responses from the OPQ Box to the Event storage service.
+As mentioned previously responses from device command need not return to the same service that sent the command.
+Instead the responses will be routed to a service which is subscribed to the identity used in the request.
+The $EVENT\_TOKEN$ root is a 16 character random hexadecimal string, which identifies which commands which correspond to a single event.
+Since a single event may contain data from multiple OPQ Boxes, each event will have a unique $EVENT\_TOKEN$ root.
+The $ACQ\_UUID$ postfix is used to identify the Acquisition service which triggered the data request.
+Multiple Acquisition Services can be used to service the OPQ network, and each one is identified using it's own UUID identifier.
+This identifier may be assigned to each service via the configuration file, or autogenerated at startup.
+
+Once the identity of each command is filled in, each command is forwarded to the Acquisition broker for routing to OPQ Boxes.
+
+\subsection{Event Service.}\label{subsec:event-service}
+
+Event service is a microservice which stores raw data generated by OPQ Boxes in the Mongo Database.
+On initialization Event service queries mongo database for the highest event number recorded so far, connects to the Acquisition Broker's publish port,
+and subscribes to all messages that start with the prefix ``$data\_$".
+This allows the Event service to capture every response from OPQ Boxes generated from commands issued by the Acquisition service plugins.
+Once the Event service receives a data response with an identity containing an $EVENT\_TOKEN$ it hasn't seen before it will increment the event number, and
+store it in an internal key value store.
+This way every future data message which contains that $EVENT\_TOKEN$, it will be appended to the same event.
+Mongo ER diagram of the mongo event storage is shown in Figure \ref{fig:opq:mongo_er}.
+Events collection contains metadata for individual events.
+Box\_events collection contains metadata for event information from individual OPQ devices.
+Finally gridfs, Mongo internal file storage, is used for storing event data.
+
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[width=0.9\textwidth]{img/mongo_event_storage.pdf}
+	\end{center}
+	\caption{ER diagram of event storage in Mongo DB}
+	\label{fig:opq:mongo_er}
+\end{figure}
+
+\subsection{Acquisition Service Plugins}\label{subsec:acquisition-service-plugins}
+
+Acquisition service plugins are responsible mor monitoring the OPQ Box triggering streams and determining when to request raw data.
+A such Acquisition service plugins constitute the majority of business logic for the OPQ Makai system.
+There are currently four plugins developed for this system:
+\begin{enumerate}
+	\item Health Plugin.
+	\item Debug Plugin.
+	\item Threshold Trigger.
+	\item Napali Trigger.
+\end{enumerate}
+
+\subsubsection{Health Plugin}
+
+The health plugin is responsible for monitoring the triggering messages passing through the Acquisition Service.
+It maintains a REST endpoint for reporting the OPQ Network status.
+Furthermore the REST endpoint can be used to trigger a device for debugging purposes.
+
+\subsubsection{Debug Plugin}
+Debug plugin consists of a Lisp interpreter which can manipulate the triggering stream, and emit triggering commands for devices.
+It can be used to quickly and interactively test new analysis methods, and debug the OPQ network.
+
+\subsubsection{Threshold Trigger}
+Threshold trigger plugin is used for in situ comparison of a naive triggering method to Napali.
+Every time the Threshold plugin receives a triggering message, it will check it against global thresholds.
+If a metric value is outside of the predetermined thresholds the Triggering plugin will latch the timestamp and the id of the affected device.
+Once the metric returns to normal, Threshold plugin will emit a request for raw data to the device which is experiencing an event.
+If an event is longer then 50\% of the RDRB of an OPQ Box buffer an event will be broken up into several shorter events.
+Threshold values for each metric are shown in Table \ref{tbl:opq:thresholds}
+
+\begin{center}
+	\begin{table}[!ht]
+		\caption{Treshold values for each metric}
+		\label{tbl:opq:thresholds}
+		\begin{tabularx}{\textwidth}[t]{bss}
+			\textbf{Metric} & \textbf{Min} &\textbf{Max}\\
+			\arrayrulecolor{black}\hline
+			$V_{rms}$ & $110V_{rms}$ & $120V_{rms}$ \\
+			\arrayrulecolor{black}\hline
+			$f_{fundamental}$ & $59.9Hz$ & $60.1Hz$ \\
+			\arrayrulecolor{black}\hline
+			$THD$ & N/A & $5\%$ \\
+			\arrayrulecolor{black}\hline
+			$Trans$ & N/A & $8V$ \\
+		\end{tabularx}
+	\end{table}
+\end{center}
+
+
+Threshold Trigger plugin functions in the same way as a self-triggering device.
+Since this method of event detection does not rely on intra-box information sharing, it functions in the same manner as if the OPQ Box itself
+is performing event detection.
+This allows for experimental comparison of the Napali method efficiency with the self-triggered methodology.
+
+\subsubsection{Napali Trigger}\label{subsec:napali-trigger}
+
+Napali Trigger plugin implements the Napali event detection method.
+Napali Trigger state machine is kicked off the same way as the Threshold trigger.
+If a received metric value is outside of the predetermined thresholds Napali plugin will latch the timestamp and the id of the affected device.
+Similarly, once the offending metric from all devices return to normal, Napali plugin will emit a request for raw data to the device which is experiencing an event.
+The main difference between the Napali trigger and the Threshold trigger are two-fold:
+\begin{enumerate}
+	\item An event is not considered finished until every device's metrics return to the nominal threshold range.
+	\item Metric value is within the nominal threshold but outside 3 standard deviations of a mean, will cause a the device to be participating in the  event.
+\end{enumerate}
+
+The first difference allows Napali to track a propagation of a fault throughout the power delivery network.
+Furthermore, during a lifetime of a power quality event, it may shift from one metric to another.
+As the disturbance travels, through the power-grid, Napali will aggregate all of the temporally localized disturbances into one event.
+The second disturbance allows for recording of sub-threshold data to be acquired from devices which did not pass the threshold, but exhibited anomalous behaviour.
+
+The mean and standard deviation are calculated using two first order IIR filter loops as show in Equation \ref{eq:fir_mean}:
+\begin{equation}\label{eq:fir_mean}
+\begin{aligned}
+	\mu_{n+1} = (1- \alpha)*\mu_{n} + \alpha * m \\
+	\mu^2_{n+1} = (1- \alpha)*\mu^2_n + \alpha * m^2 \\
+	\sigma^2_n = \mu^2_n - (\mu_n)^2 \\
+	\sigma_n =\sqrt{\sigma_n^2}
+\end{aligned}
+\end{equation}
+Where $\mu$ is the mean, $\sigma$ is the standard deviation, $m$ is the new sample and $\alpha$ is the decay parameter.
+Notice that $(\mu)^2$ is the square of the mean, and $\mu^2$ is the mean of the squares.
+The $\alpha$ parameter determines the memory of the filter, and can be computed as:
+\begin{equation}\label{eq:fir_alpha}
+\begin{aligned}
+	\alpha = 1 - e^{2\pi\frac{T_{sample}}{T_{memory}}}
+\end{aligned}
+\end{equation}
+Where $T_{sample}$ is the sampling rate of the system, 1s for OPQ, and $T_{memory}$ is the desired response of the system.
+
+Using an IIR filter for mean and standard deviation calculation is computational cheaper then using a FIR window.
+Furthermore, using the IIR filter makes it trivial to tune the response of the system during runtime.
 
 \section{OPQ Mauka}\label{sec:opq-mauka}
 OPQ Mauka service is responsible for higher level classification and filtering of the anomalies generated by the OPQ Makai.
