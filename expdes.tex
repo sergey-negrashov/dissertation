@@ -88,7 +88,134 @@ Regardless, the result shown in Figure~\ref{fig:expdes:4:2} is presented only as
 As such, the figure of $\sigma=0.125V$ should be considered valid for the OPQBox transient detection capability.
 Since this metric is only used in transient detection and not characterization, it was found to be sufficient.
 
-\section{Napali Validation.}\label{sec:napali-validation.}
+\section{Napali Validation}\label{sec:napali-validation.}
+Napali method was validated using simulation, synthetic data with the device-in-loop, and in-situ during the deployment.
+The main tunable parameter in the napali is the $\alpha$ coefficient used in the low pass filter as shown in Equation \ref{eq:iir_mean}.
+This parameter determines the memory of the lowpass filter used in the calculation of the mean and the standard deviation of metrics from OPQBox data stream.
+These statistics are in turn used during the Napali triggering process to locate sub-threshold gridwide events.
+
+\subsection{Selection of $\alpha$ parameter}\label{subsec:selectrion-ofparameter}
+Smaller $\alpha$ parameter corresponds to a longer memory in the low pass filter as shown in Equation \ref{eq:iir_alpha}.
+This is further visualized in Figure \ref{fig:expdes:5}.
+In particular this Figures \ref{fig:expdes:5:1} and \ref{fig:expdes:5:2} show the response of the IIR low pass filter to the simulated frequency measurements.
+The dashed red line represents the frequency measurement, solid red line represents the filtered mean, and the blue line represents the standard diviation.
+Figures \ref{fig:expdes:5:1} shows the filter response for $\alpha = 0.5$ or $T_{memory} \approx 10s $.
+As evident from the plot, the mean and the standard deviation quickly recover from the transient are return to the nominal values.
+Furthermore, the mean is closely tracking the random fluctuations present in the measurement.
+Figures \ref{fig:expdes:5:1} shows the filter response for $\alpha = 0.05$ or $T_{memory} \approx 123s $.
+While the stimuli remains the same, it takes significantly longer the statistics to recover.
+Additionally, the mean no longer tracks the frequency fluctuations present in the simulated data.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{0.9\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/Napali_response_freq_05.pdf}
+        \caption{}
+        \label{fig:expdes:5:1}
+    \end{subfigure}%
+
+    \begin{subfigure}{0.9\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/Napali_response_freq_005.pdf}
+        \caption{}
+        \label{fig:expdes:5:2}
+    \end{subfigure}
+    \caption{$\mu$ and $\sigma$ behaviour with a)$\alpha = 0.5$ and b)$\alpha=0.05$}
+    \label{fig:expdes:5}
+\end{figure}
+
+Picking the $\alpha$ parameter for Napali is extremely domain specific, as it depends on the frequency content of the triggering stream.
+Intuitively, the $T_{memory}$ parameter needs to be long enough to adjust to gradual changes in the triggering stream for the mean calculation,
+and dampen the standard deviation for detection of multiple consecutive outliers.
+In addition, it needs to be short enough to be converge on the mean and the standard deviation during a step-like transition in the triggering stream.
+
+Luckily, in the Power Quality domain the Napali $\alpha$ selection is fairly forgiving.
+This is demonstrated in Figure \ref{fig:expdes:6}.
+This graph represents the amount of time that Napali considered one of the metrics to be outside of the $3\sigma$ of the mean for various values of $\alpha$.
+The triggering stream used to generate these values was captured over 24 hours by one of the OPQBoxes deployed on the University of Hawaii campus.
+All devices deployed thus far have followed a similar pattern.
+With $200s <T_{memory} < 2Hr$ the triggering stream resulted in similar behaviour, with the system correctly marking all potential sub-threshold events.
+At $T_{memory} \approx 500s$, system quickly recovered from large jumps in the triggering stream, however it marked a significant number of small deviations ($\Delta_{f}>0.01Hz$, $\Delta_{v}> 0.1V$\ldots etc) as outside $3\sigma$, and thus candidates for sub-threshold events.
+At $T_{memory} \approx 2Hr$, system took  significant amount of time to recover from large jumps in triggering metrics, thus marking the metric as outside of $3\sigma$ for many tens of minutes.
+Furthermore, some of the larger anomalous measurements ($\Delta_{f}>0.05Hz$, $\Delta_{v}> 2V$\ldots etc) were no longer flagged as sub-threshold candidates.
+Outside of the two extremes, the system behaviour was quite similar.
+During all of the deployments the OPQ system was operating with:
+\begin{equation}\label{eq:opq_alpha}
+\begin{aligned}
+    \alpha = 0.005
+\end{aligned}
+\end{equation}
+
+
+Which corresponds to the $T_{memory} \approx 21$ minutes.
+Thresholds which initiate the event are shown in Table \ref{tbl:opq:thresholds}.
+
+\begin{figure}[h]
+    \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/a_selection.pdf}
+    \caption{Amount of time a metric spends outside of the $3\sigma$ for various values of $\alpha$}
+    \label{fig:expdes:6}
+\end{figure}
+
+The effect of the of selecting alpha as shown in Equation \ref{eq:opq_alpha} can be observed in Figure \ref{fig:expdes:7}.
+This figure shows interesting features form the same dataset that was used to produce Figure \ref{fig:expdes:6}.
+Blue traces show metrics that exhibit anomalous behaviour, while red indicates that Napali has flagged this temporal region as a sub-threshold event candidate.
+Figure \ref{fig:expdes:7:1} shows a frequency fluctuation which nearly passes the threshold of $60.1Hz$ which would mark it as a full fledged event.
+Instead, Napali marked almost the entirety of the fluctuation as a potential sub-threshold event, as shown by the red trace.
+Figure \ref{fig:expdes:7:2} shows a step in the total harmonic distortion metric, similar to the one shown in Figure \ref{fig:opq:7} at the 6am mark.
+In this case the metric in question abruptly changed to a new mean, requiring a fairly slow $\alpha$ coefficient to catch up over 3 minutes.
+While it may seem wasteful to mark large temporal regions following an abrupt jump as candidates for sub-threshold event, it is important to note that:
+\begin{enumerate}
+    \item Making the $\alpha$ parameter smaller does not benefit the false positive rate as shown in Figure \ref{fig:expdes:6}.
+    \item In-situ there is no way to tell if an abrupt shift is a switch to a new steady state, or if the metric will recover to a previous mean.
+\end{enumerate}
+It is important to remember than Napali is not meant to have a low false positive rate.
+Instead, a system like OPQ Mauka can use all available information, including the raw data, to determine if an event is gridwide or not with much higher confidence.
+The main goal of Napali is to have an extremely low rate of false negatives.
+Figure \ref{fig:expdes:7:3} is on a different timescale from Figures \ref{fig:expdes:7:2} and \ref{fig:expdes:7:1}.
+This is done in order to include several potential sub-threshold events into a common chart.
+Five temporal regions during the the 3 Hrs are marked by Napali as potential sub-threshold events.
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/napali_live_f.pdf}
+        \caption{}
+        \label{fig:expdes:7:1}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/napali_live_thd.pdf}
+        \caption{}
+        \label{fig:expdes:7:2}
+    \end{subfigure}
+
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/napali_live_rms.pdf}
+        \caption{}
+        \label{fig:expdes:7:3}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/napali_live_trans.pdf}
+        \caption{}
+        \label{fig:expdes:7:4}
+    \end{subfigure}
+
+    \caption{Potential sub-threshold events for a) $f_{fundamental}$, b)$THD$, c)$V_{rms}$ and d)$Trans$.
+    Red boxes indicate that Napali picked these temporal windows as a potential sub-threshold event.}
+    \label{fig:expdes:7}
+\end{figure}
+
+\subsection{Sub-Threshold Event Detection}
+
+\clearpage
+
+\clearpage
+
+\section{Stop Reading here.}\label{sec:stop-reading.}
 In order to validate the OPQ system as a whole, it will be deployed across the University of Hawaii Manoa campus (UH).
 This location is ideal because it is a relatively isolated microgrid connected to the Oahu powergrid only via a single 46kV feeder as shown in Figure~\ref{expdes:fig:1}.
 Another advantage of the UH campus is the high number of smart meters deployed across various levels of the power delivery infrastructure.
