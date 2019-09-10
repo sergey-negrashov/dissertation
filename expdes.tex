@@ -100,7 +100,7 @@ This is further visualized in Figure \ref{fig:expdes:5}.
 In particular this Figures \ref{fig:expdes:5:1} and \ref{fig:expdes:5:2} show the response of the IIR low pass filter to the simulated frequency measurements.
 The dashed red line represents the frequency measurement, solid red line represents the filtered mean, and the blue line represents the standard diviation.
 Figures \ref{fig:expdes:5:1} shows the filter response for $\alpha = 0.5$ or $T_{memory} \approx 10s $.
-As evident from the plot, the mean and the standard deviation quickly recover from the transient are return to the nominal values.
+As evident from the plot, the mean and the standard deviation quickly recover from the transient are return to their nominal values.
 Furthermore, the mean is closely tracking the random fluctuations present in the measurement.
 Figures \ref{fig:expdes:5:1} shows the filter response for $\alpha = 0.05$ or $T_{memory} \approx 123s $.
 While the stimuli remains the same, it takes significantly longer the statistics to recover.
@@ -127,8 +127,8 @@ Additionally, the mean no longer tracks the frequency fluctuations present in th
 
 Picking the $\alpha$ parameter for Napali is extremely domain specific, as it depends on the frequency content of the triggering stream.
 Intuitively, the $T_{memory}$ parameter needs to be long enough to adjust to gradual changes in the triggering stream for the mean calculation,
-and dampen the standard deviation for detection of multiple consecutive outliers.
-In addition, it needs to be short enough to be converge on the mean and the standard deviation during a step-like transition in the triggering stream.
+and dampen the standard deviation for detection of multiple consecutive anomalies.
+In addition, it needs to be short enough to converge on the mean and the standard deviation during a step-like transition in the triggering stream.
 
 Luckily, in the Power Quality domain the Napali $\alpha$ selection is fairly forgiving.
 This is demonstrated in Figure \ref{fig:expdes:6}.
@@ -136,7 +136,7 @@ This graph represents the amount of time that Napali considered one of the metri
 The triggering stream used to generate these values was captured over 24 hours by one of the OPQBoxes deployed on the University of Hawaii campus.
 All devices deployed thus far have followed a similar pattern.
 With $200s <T_{memory} < 2Hr$ the triggering stream resulted in similar behaviour, with the system correctly marking all potential sub-threshold events.
-At $T_{memory} \approx 500s$, system quickly recovered from large jumps in the triggering stream, however it marked a significant number of small deviations ($\Delta_{f}>0.01Hz$, $\Delta_{v}> 0.1V$\ldots etc) as outside $3\sigma$, and thus candidates for sub-threshold events.
+At $T_{memory} \approx 500s$, system quickly recovered from large jumps in the triggering stream, however it marked a significant number of small anomalies ($\Delta_{f}>0.01Hz$, $\Delta_{v}> 0.1V$\ldots etc) as outside $3\sigma$, and thus candidates for sub-threshold events.
 At $T_{memory} \approx 2Hr$, system took  significant amount of time to recover from large jumps in triggering metrics, thus marking the metric as outside of $3\sigma$ for many tens of minutes.
 Furthermore, some of the larger anomalous measurements ($\Delta_{f}>0.05Hz$, $\Delta_{v}> 2V$\ldots etc) were no longer flagged as sub-threshold candidates.
 Outside of the two extremes, the system behaviour was quite similar.
@@ -149,7 +149,7 @@ During all of the deployments the OPQ system was operating with:
 
 
 Which corresponds to the $T_{memory} \approx 21$ minutes.
-Thresholds which initiate the event are shown in Table \ref{tbl:opq:thresholds}.
+Thresholds which initiate the Napali event detection state machine are shown in Table \ref{tbl:opq:thresholds}.
 
 \begin{figure}[h]
     \centering
@@ -171,7 +171,7 @@ While it may seem wasteful to mark large temporal regions following an abrupt ju
     \item In-situ there is no way to tell if an abrupt shift is a switch to a new steady state, or if the metric will recover to a previous mean.
 \end{enumerate}
 It is important to remember than Napali is not meant to have a low false positive rate.
-Instead, a system like OPQ Mauka can use all available information, including the raw data, to determine if an event is gridwide or not with much higher confidence.
+Instead, a system like OPQ Mauka can use all available information, including the raw data, to determine if an event is true gridwide event with much higher confidence.
 The main goal of Napali is to have an extremely low rate of false negatives.
 Figure \ref{fig:expdes:7:3} is on a different timescale from Figures \ref{fig:expdes:7:2} and \ref{fig:expdes:7:1}.
 This is done in order to include several potential sub-threshold events into a common chart.
@@ -209,8 +209,81 @@ Five temporal regions during the the 3 Hrs are marked by Napali as potential sub
     \label{fig:expdes:7}
 \end{figure}
 
-\subsection{Sub-Threshold Event Detection}
+\subsection{Sub-Threshold Event Detection}\label{subsec:sub-threshold-event-detection}
 
+One of the main goals of Napali is to utilize metric extraction in order to detect sub-threshold events.
+During the deployment, two types of subthreshold events have been identified:
+\begin{itemize}
+    \item Partial sub-threshold event.
+    \item Full sub-threshold event.
+\end{itemize}
+Full sub-threshold events consist of one or several devices passing the threshold described in Table \ref{tbl:opq:thresholds},
+as well as one or several devices marked as sub-threshold by Napali.
+Partial sub-threshold events consist of devices which all passed the threshold described in Table \ref{tbl:opq:thresholds}, however some of the devices triggered on a different metric with a much shorter temporal window.
+The important distinction between partial sub-threshold events and regular events is that if triggered using the self-triggering method, the majority of the sub-threshold data would be lost.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{1\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/rms_gridwide_subthreshold.pdf}
+        \caption{}
+        \label{fig:expdes:8:1}
+    \end{subfigure}%
+
+    \begin{subfigure}{1\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_subthreshold_zoom.pdf}
+        \caption{}
+        \label{fig:expdes:8:2}
+    \end{subfigure}
+    \caption{Partial sub-threshold event a) the sub-threshold component of the event, b) above threshold component of the event}
+    \label{fig:expdes:8}
+\end{figure}
+
+An example of a partial sub-threshold event is shown in Figure \ref{fig:expdes:8}.
+Figure \ref{fig:expdes:8:1} shows the sub-threshold component of the event.
+In this event device 2 passed the threshold on $V_{rms}$ metric, initiating Napali to look for sub-threshold events across other devices.
+It is important to note, that at the event start device 1 was considered to be a sub-threshold candidate, however, at $t \approx 26.8s$ device 1 produced a transient metric which was above napali threshold.
+As such Napali requested raw data from both device 1 and device 2, creating a partial sub-threshold event containing both a voltage sag shown in Figure \ref{fig:expdes:8:1} and a transient shown in Figure \ref{fig:expdes:8:2}.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full1.pdf}
+        \caption{}
+        \label{fig:expdes:9:1}
+    \end{subfigure}%
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full2.pdf}
+        \caption{}
+        \label{fig:expdes:9:2}
+    \end{subfigure}
+
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full3.pdf}
+        \caption{}
+        \label{fig:expdes:9:3}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full4.pdf}
+        \caption{}
+        \label{fig:expdes:9:4}
+    \end{subfigure}
+    \caption{Full sub-threshold event across 4 devices.
+    a) Device 1: above threshold b) Device 2: sub-threshold c) Device 3: above threshold d) Device 4: above threshold.}
+    \label{fig:expdes:9}
+\end{figure}
+
+An example of a full sub-threshold event is shown in Figure \ref{fig:expdes:9}.
+This is a short-lived transient event observed by four devices on September 5\textsuperscript{th}.
+Devices 1, 3, and 4 generated a transient metric higher then the Napali threshold.
+Device 2 transient metric did not pass threshold, yet nonetheless produced a severe enough deviation from the mean for Napali to consider it a part of the event.
+This is particularly evident in the mild transient observed in Figure \ref{fig:expdes:9:2}.
 \clearpage
 
 \clearpage
