@@ -284,39 +284,68 @@ This is a short-lived transient event observed by four devices on September 5\te
 Devices 1, 3, and 4 generated a transient metric higher then the Napali threshold.
 Device 2 transient metric did not pass threshold, yet nonetheless produced a severe enough deviation from the mean for Napali to consider it a part of the event.
 This is particularly evident in the mild transient observed in Figure \ref{fig:expdes:9:2}.
-\clearpage
 
-\clearpage
+\section{University of Hawaii Deployment.}
 
-\section{Stop Reading here.}\label{sec:stop-reading.}
-In order to validate the OPQ system as a whole, it will be deployed across the University of Hawaii Manoa campus (UH).
-This location is ideal because it is a relatively isolated microgrid connected to the Oahu powergrid only via a single 46kV feeder as shown in Figure~\ref{expdes:fig:1}.
+As part of the Napali validation, the OPQ system was deployed across the University of Hawaii Manoa campus (UH).
+This location was ideal because it is an isolated microgrid connected to the Oahu powergrid only via a single 46kV feeder as shown in Figure~\ref{expdes:fig:1}.
 Another advantage of the UH campus is the high number of smart meters deployed across various levels of the power delivery infrastructure.
-While these meters are mainly geared towards monitoring power consumption they do have some power quality monitoring capabilities.
-Data provided from these meters can be used in two distinct applications.
-First of all, this data can be used to pinpoint the sections of the University of Hawaii power grid which experience a higher likelihood of power quality disturbances.
-These portions of the grid will have a higher spacial density of OPQ Boxes.
-Secondly, data from the campus deployed meters can be used as ground truth for comparison against the measurements, and analysis performed by the OPQ project.
+While the purpose of these meters is monitoring the power consumption, they do include some rudimentary power quality monitoring capabilities.
+Data from the campus deployed meters was used as ground truth for comparison against the measurements, and analysis performed by the OPQ project.
 The location of smart meters in the grid topology is shown in figure~\ref{expdes:fig:1} as the $M$ nodes.
-As evident by the meter location none of them are monitoring the consumer level power and mainly focus on the higher voltage power delivery.
-This placement is evidenced from the smart meter role as a consumption monitor, and thus the deployment of the OPQ Boxes at the residential level will compliment the current power quality monitoring capabilities without introducing redundancies.
-Finally, the University of Hawaii power grid is supplying a highly diverse infrastructure.
+As evident by the meter location none of them were monitoring the consumer level power and mainly focused on the higher voltage power delivery.
+This placement was a consequence of the smart meters role as a consumption monitor, and thus the deployment of the OPQ Boxes at the residential level complimented UH power quality monitoring capabilities without introducing redundancies.
+University of Hawaii power grid is supplying a highly diverse infrastructure.
 Beyond the traditional residential equipment such as computers and consumer grade electronics, the UH power grid powers scientific and laboratory equipment, machine shops, and server farms.
 All of these elements have varying requirements/tolerances for power quality anomalies as well as different levels of power quality ``pollution''.
 Furthermore, some of the electricity consumers in the UH campus are entirely unique.
 For example, the free electron laser located in the Watanabe Hall is one of the only free electron lasers in the world, and the impact/sensitivity of power quality on the instrument are completely unstudied.
 \begin{figure}[h]
-	\centering
-	\includegraphics[width=1\linewidth]{img/uh-grid.pdf}	
-	\caption{University of Hawaii at Manoa power delivery infrastructure.}
-	\label{expdes:fig:1}
+    \centering
+    \includegraphics[width=1\linewidth]{img/uh-grid.pdf}
+    \caption{University of Hawaii at Manoa power delivery infrastructure.}
+    \label{expdes:fig:1}
 \end{figure}
 
-There are 74 smart meters deployed across the UH campus.
-These meters measure the fundamental frequency $V_{rms}$, power consumption, reactive power, and power factor.
-Data from these meters will be cross-referenced with the Napali detection system in order to ascertain it's benefits.
-Validations of the benefits of the Napali framework will follow the framework described in Section~\ref{intro:sec:claim}.
-Here we examine the analysis required to complete each claim in detail.
+There were 74 smart meters deployed across the UH campus.
+These meters measured the fundamental frequency $V_{rms}$, power consumption, reactive power, and power factor.
+Data from these meters was cross-referenced with the Napali detection system in order to ascertain it's benefits.
+
+OPQ Box placement was specifically selected to cover as much of the University of Hawaii power delivery infrastructure as possible.
+The OPQ Box deployment is shown in Figure \ref{expdes:fig:deploy}.
+By spreading out devices across the entire power grid, OPQ system is able to monitor the propagation of power quality disturbances throughout the UH power grid.
+Consider the event shown in Figure \ref{fig:expdes:9}.
+Figure \ref{expdes:fig:grid_wide_filtered} shows the same event with the fundamental and harmonics suppressed using a notch filter bank.
+Furthermore, the location annotation is added to indicate the device location.
+The most affected devices were located at the Physical Plant and Hamilton Library, recording a $~60V_{pp}$ transient.
+Incidentally, both of these devices are monitoring a subgrid rooted at transformer(MA4).
+Another device recorded this event was located in Watanabe Hall.
+This device recorded a $30V_{pp}$ transient, still above the threshold for detection.
+This device was monitoring the the subgrid rooted at the transformer LA4.
+The final device was located at the parking structure entirely across campus.
+This device recorded a $15V_{pp}$ transient, about 1V below the required magnitude for the threhold based detection.
+However, Napali was able to determine that the parking structure OPQ Box was affected by the disturbance, and requested the raw data regardless.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\linewidth]{img/deployment/gridwide_locality.pdf}
+    \caption{Filtered Transient from event shown in Figure \ref{fig:expdes:9}}
+    \label{expdes:fig:grid_wide_filtered}
+\end{figure}
+
+From the data gathered by Napali as shown in Figure \ref{expdes:fig:grid_wide_filtered}, it seems apparent that the disturbance originated at the subgrid rooted at the transformer MA4.
+The Watanabe device was affected due to the short geographic and electrical distance to the MA4 subgrid.
+By the time transient reached the parking structure, it was significantly attenuated by the transformers and transmission lines.
+It was only detected due to the sub-threshold detection ability of the Napali framework.
+\clearpage
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/deployment/uh_power_grid.pdf}
+    \caption{OPQ Box location across Univerisy of Hawaii.(TODO so where are the fing boxes)}
+    \label{expdes:fig:deploy}
+\end{figure}
+
+\clearpage
 
 \subsection{Napali Bandwidth usage} \label{iexp:sec:band}
 In order to analytically compute the bandwidth savings of the Napali compared to a system which sends all the data to the sink, I will keep track of the amount of bandwidth the Napali monitoring system consumed during its deployment on UH campus.
