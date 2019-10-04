@@ -285,7 +285,7 @@ Devices 1, 3, and 4 generated a transient metric higher then the Napali threshol
 Device 2 transient metric did not pass threshold, yet nonetheless produced a severe enough deviation from the mean for Napali to consider it a part of the event.
 This is particularly evident in the mild transient observed in Figure \ref{fig:expdes:9:2}.
 
-\section{University of Hawaii Deployment.}
+\section{University of Hawaii Deployment.}\label{sec:university-of-hawaii-deployment.}
 
 As part of the Napali validation, the OPQ system was deployed across the University of Hawaii Manoa campus (UH).
 This location was ideal because it is an isolated microgrid connected to the Oahu powergrid only via a single 46kV feeder as shown in Figure~\ref{expdes:fig:1}.
@@ -341,25 +341,84 @@ It was only detected due to the sub-threshold detection ability of the Napali fr
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.7\linewidth]{img/deployment/uh_power_grid.pdf}
-    \caption{OPQ Box location across Univerisy of Hawaii.(TODO so where are the fing boxes)}
+    \caption{OPQ Box locations and device IDs across University of Hawaii.}
     \label{expdes:fig:deploy}
 \end{figure}
 
 \clearpage
 
 \subsection{Napali Bandwidth usage} \label{iexp:sec:band}
-In order to analytically compute the bandwidth savings of the Napali compared to a system which sends all the data to the sink, I will keep track of the amount of bandwidth the Napali monitoring system consumed during its deployment on UH campus.
-This will in turn be compared to the bandwidth required by the OPQ Boxes if they were sending the entirety of the data to the sink, and establish the bandwidth efficiency of the Napali framework.
-In order to monitor the bandwidth of the system in-situ, an iptables bandwidth accounting will be enabled on the sink node.
-With the accounting enabled, I will be able to extract the exact amount of bytes transfered by the Napali framework during the deployment period.
+During the OPQ deployment It was found that Napali significantly outperformed both the self-triggered and the Naive event detection methods.
+In order to evaluate the bandwidth performance of Napali a self-triggered plugin was ran along side it inside the Makai host.
+This plugin utilized the same thresholds as Napali as described in Table \ref{tbl:opq:thresholds}.
+However the self-triggered plugin did not take into the account any inter-device signatures.
+This method is equivalent to each the device performing non-collaborative triggering.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/napali_eval/napali_request_bandwidth.pdf}
+    \caption{Amount of data requested from 10 OPQ Boxes via the self-triggered and Napali methods.}
+    \label{expdes:fig:self_triggered_bandwidth}
+\end{figure}
+
+Figure \ref{expdes:fig:self_triggered_bandwidth} shows the amount of data requested from 10 devices by the self-triggered and Napali plugins over 24 Hours.
+It is evident, that the majority of data requests for the self-triggered method resulted in local noise, and did not contribute to the grid measurements.
+Napali on the other hand, ignored anomalies which did not affect more then a single device, while requesting sub-threshold data during a gridwide PQ event.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/napali_metric_bandwidth.pdf}
+        \caption{}
+        \label{expdes:fig:napali_metric_bandwidth}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/napali_cmd_bandwidth.pdf}
+        \caption{}
+        \label{expdes:fig:napali_cmd_bandwidth}
+    \end{subfigure}
+    \caption{Penalties incurred by the Napali framework.
+    a) Metrics received from 10 OPQ Boxes.
+    b) Commands sent to 10 OPQ Box }
+    \label{expdes:fig:napali_bandwidth_penalty}
+\end{figure}
+
+It should be noted that the self-triggered method does not incur the penalty of having to constantly transmit the device metrics to the sink, since all the event detection is performed on the device.
+Figure \ref{expdes:fig:napali_metric_bandwidth} shows the amount of data received via metrics from 10 OPQ Boxes during the same 24 hours as the Figure \ref{expdes:fig:self_triggered_bandwidth}.
+As expected the bandwidth requirement for metric transmission remains constant, since all OPQ Boxes send the metrics at fixed intervals.
+While this penalty is significant as it constitutes 41\% of the total bandwidth used by Napali, the aggregate bandwidth is still shows a 440\% improvement over the self-triggered method.
+Another penalty incurred by Napali is the two way communication requirement.
+Each device which participated the event detection needed to receive a command with the temporal range which anomalous data.
+Neither the naive nor self-triggered methods require two-way communication, and as such there is no direct comparison to Napali.
+Figure \ref{expdes:fig:napali_cmd_bandwidth} shows the command bandwidth consumption for 10 OPQ Boxes across 24 hours.
+The total consumption was ~50kB, which is quite trivial for any modern sensor network.
+
+During the 24 hours of shown in Figures \ref{expdes:fig:napali_bandwidth_penalty} and \ref{expdes:fig:self_triggered_bandwidth}, Napali captured 60 events, while the self-triggered method captured 878.
+The average length of the Napali Event was 10s to the self-triggered 3s.
+Of 60 Napali events, all 60 contained sub-threshold data.
+
+Comparison of Napali with the naive method was performed analytically.
 Since the sampling rate of the OPQ Box is well characterized, and the number of OPQ Boxes is fixed, it is trivial to calculate the amount of raw data generated by the OPQ network during any time period.
 In order to make this comparison fair, the raw data bandwidth will be scaled by the compression ratio of the state of the art compression algorithm specifically designed for power quality measurements.\cite{zhang2009new}
-
 Operating at 12kSps, OPQ Box produces raw data at 24KB/s.
-With state of the art compression operating at 90\% compression ratio and a 5\% overhead of TCP/IP and meta-data, one can expect a ~3KB/s stream of raw data for each OPQ box if it were to send the entirety of it to the sink.
-In synthetic experiments, under steady state conditions, OPQ Box consumes 0.5KB/s of bandwidth sending metrics to the Makai.
-However, this figure does not take into account sending the raw data samples in case an event is detected.
-The result of bandwidth consumption evaluation will provide a comparison of the bandwidth consumption by Napali methodology of sending metrics and temporal raw data windows of interest compared to sending the entirety of raw data to the sink.
+With state of the art compression operating at 90\% compression ratio and 5\% overhead of meta-data, one can expect a ~3KB/s stream of raw data for each OPQ box if it were to send the entirety of it to the sink.
+For 10 OPQ Boxes we would expect the aggregate bandwidth of 30kB/s, and as such the bandwidth consumption 24.7GB/day.
+During a 24 hour period, as shown in Figures \ref{expdes:fig:napali_bandwidth_penalty} and \ref{expdes:fig:self_triggered_bandwidth}, Napali used 234MB of bandwidth.
+This corresponds to an over 100x improvement over the naive method.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/napali_eval/napali_bandwidth_comparison.pdf}
+    \caption{Bandwidth requirement comparison between three event detection methods.}
+    \label{expdes:fig:bandwidth_master_comparison}
+\end{figure}
+
+Figure \ref{expdes:fig:bandwidth_master_comparison} shows the comparison between Napali as well as the naive and self-triggered methods.
+While Napali incurs additional costs described in Figure \ref{expdes:fig:napali_bandwidth_penalty} it outperforms the comparable methods.
+Finally, the cost of the two way communication as shown in Figure \ref{expdes:fig:napali_cmd_bandwidth} is greatly outweighed by the bandwidth savings in the raw data reception.
+Modern sensor networks greatly benefit from two way communication, as it allows on-demand health monitoring, and software updates.
+With addition of Napali, two way communication allows for significant bandwidth requirement reduction in for the sensor network as a whole.
 
 \subsection{Sink processing requirement under the Napali Framework} \label{iexp:sec:scale}
 In order to evaluate the scalability of the sink node under the Napali framework, synthetic data containing a small amount of distributed events will be injected into the Makai triggering system.
