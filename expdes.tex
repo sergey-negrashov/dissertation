@@ -421,24 +421,63 @@ Modern sensor networks greatly benefit from two way communication, as it allows 
 With addition of Napali, two way communication allows for significant bandwidth requirement reduction in for the sensor network as a whole.
 
 \subsection{Sink processing requirement under the Napali Framework} \label{iexp:sec:scale}
-In order to evaluate the scalability of the sink node under the Napali framework, synthetic data containing a small amount of distributed events will be injected into the Makai triggering system.
-While the synthetic data for a single point PQ disturbance is easily generated, distributed PQ event generation is not well understood.
-However there is some literature concerning power fault propagation and localization.~\cite{parsons1998direction}~\cite{polajvzer2017evaluation} The main takeaway from these authors is the energy and amplitude of the event diminishes with electrical distance from the source.
-As such, by generating a single point PQ event as described in~\cite{kumar2015power}\cite{tan2013simulation}, and linearly scaling it based on the simulated electrical distance from the source, a distributed PQ event ensemble can be generated.
-These events will be ran through the simulated OPQ Box DSP stack and the extracted metrics will be propagated to the Makai aggregation sink.
-The number of simulated OPQ Box devices that can be supported on a single node will be recorded, and will provide the baseline for the Makai sink node capabilities.
-Next, the same dataset will be processed on the same node using simulated OPQ Box software stacks.
-The amount of concurrent processes which are able to keep up with the targeted sampling rate of $12kS/s$ will be determined and recorded, and compared to the amount of devices which can be supported by Makai.
+Sink processing capacity between self-triggered, naive and Napali are quite different.
+In general the processing requirement can be described as follows:
+\begin{equation}\label{eq:detection_cost}
+\begin{aligned}
+    C_{total} = C_{metric} + C_{correlation}
+\end{aligned}
+\end{equation}
+In the Equation \ref{eq:detection_cost} the $C_{total}$ is the total cost, $C_{metric}$ is the cost of extracting metrics, and $C_{correlation}$ is the cost of correlating metrics across device.
+This stems from the fact that any event detection algorithm will first extract useful metrics from all devices on the network and then correlate these metrics to detect anomalies.
 
-The result of this evaluation will provide a scalability metric for the Napai framework for a single sink node.
-There are independent metrics which will be presented.
-First, the number of OPQ Boxes which can reliably send metrics to a single Makai instance for processing will be established.
-This number is expected to be quite high since the bandwidth and computational requirements for processing the triggering stream are quite low.
-Second, the number of OPQ Boxes, that can experience and reliably send an event to Makai at the same time will be established.
-The bandwidth requirement for raw data acquisition is significantly higher then the triggering stream, however there is no computation involved in storing raw data frames.
-Both of these metrics will be compared to the scalability of performing the entirety of processing on the sink node.
+First, lets consider the Naive method.
+In this case all of the metrics need to be extracted at the sync.
+Disregarding the processing power required to keep up with the data rate described in Section \ref{iexp:sec:band} the metric processing cost can be measured imperially.
+In order to do that the OPQ Box software was build for an x86 architecture and stress-tested.
+Instead of acquiring data from a device driver, the feature extraction stack was supplied with synthetic data.
+Finally the ZMQ communication was removed and replaced with the performance analysis code.
+Stress test was performed on a Intel Core i9-8950HK CPU with thermal management disabled running at 2.9GHz.
+Under such conditions, the metric extraction stack was able to extract features from 1s worth of raw data in $8ms$ running on a single core.
+Since metric extraction has no inter-device data dependencies, a modern 8 core CPU we can expect to be able to extract features from 100 devices.
+
+Self triggered method cuts down the amount of raw data that will be processed from each individual device by a factor of 25.
+This means that metric extraction step computational resource consumption is reduced by the same factor.
+Self triggered method can support up 2500 devices on a modern 8 core CPU.
+
+Finally, Napali further reduces the metric extraction cost by filtering out local noise from the gridwide events.
+A further 440\% efficiency from data size reduction results in a scalability improvements of 10000\% over the naive method.
+As such a single 8 core CPU can support metric extraction for 10000 devices.
+This can allow a single server running metric extraction to provide 5\% coverage of households in the city of Honolulu.
+It is important to consider, that Napali already posses low fidelity metrics for every event it collects.
+This in turn can also improve the scalability of Napali.
+For example a common fundamental frequency extraction involves fitting a sine wave to the voltage waveform.
+By using the coarse metric transmitted by the device, the fitter has a better initial condition, and thus will converge faster.
+
+
 
 \subsection{Effects of latency in the Napali framework} \label{iexp:sec:lat}
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/event_length.pdf}
+        \caption{}
+        \label{expdes:fig:event_length}
+    \end{subfigure}%
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/latency.pdf}
+        \caption{}
+        \label{expdes:fig:latency}
+    \end{subfigure}
+    \caption{Event length(a) and message latency(b) observed by the OPQ devices.}
+
+    \label{expdes:fig:el_la}
+\end{figure}
+
+
 The latency of Napali triggering system has a significant impact on its ability to read out complete raw data events.
 Using generated distributed events as a baseline, I will be able to tune the threshold and temporal requirements for Makai detection algorithms.
 Furthermore, temporal, spacial, and amplitude noise will be injected into the generated datasets, to simulate various uncertainties with regards to data collection, such as local noise, and NTP offset errors.
