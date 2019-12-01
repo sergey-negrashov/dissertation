@@ -421,39 +421,61 @@ Modern sensor networks greatly benefit from two way communication, as it allows 
 With addition of Napali, two way communication allows for significant bandwidth requirement reduction in for the sensor network as a whole.
 
 \subsection{Sink processing requirement under the Napali Framework} \label{iexp:sec:scale}
-Sink processing capacity between self-triggered, naive and Napali are quite different.
+Sink processing capacity for event detection between self-triggered, Naive and Napali are quite different.
 In general the processing requirement can be described as follows:
 \begin{equation}\label{eq:detection_cost}
 \begin{aligned}
-    C_{total} = C_{metric} + C_{correlation}
+    C_{total} = C_{detection} + C_{metric\_extraction}
 \end{aligned}
 \end{equation}
-In the Equation \ref{eq:detection_cost} the $C_{total}$ is the total cost, $C_{metric}$ is the cost of extracting metrics, and $C_{correlation}$ is the cost of correlating metrics across device.
-This stems from the fact that any event detection algorithm will first extract useful metrics from all devices on the network and then correlate these metrics to detect anomalies.
+
+In the Equation \ref{eq:detection_cost} the $C_{total}$ is the total cost, $C_{metric\_extraction}$ is the cost of extracting metrics.\cite{de2015effective}
+Each of the three methods, Napali, self triggered, and Naive, has different sink costs associated with each parameter.
 
 First, lets consider the Naive method.
-In this case all of the metrics need to be extracted at the sync.
-Disregarding the processing power required to keep up with the data rate described in Section \ref{iexp:sec:band} the metric processing cost can be measured imperially.
-In order to do that the OPQ Box software was build for an x86 architecture and stress-tested.
+In this case all of the metrics need to be extracted at the sink.
+Disregarding the processing power required to keep up with the data rate described in Section \ref{iexp:sec:band} the $C_{feature\_extraction}$ can be measured imperially.
+In order perform this measurement OPQ Box software was build for an x86 architecture and stress-tested.
 Instead of acquiring data from a device driver, the feature extraction stack was supplied with synthetic data.
 Finally the ZMQ communication was removed and replaced with the performance analysis code.
 Stress test was performed on a Intel Core i9-8950HK CPU with thermal management disabled running at 2.9GHz.
-Under such conditions, the metric extraction stack was able to extract features from 1s worth of raw data in $8ms$ running on a single core.
-Since metric extraction has no inter-device data dependencies, a modern 8 core CPU we can expect to be able to extract features from 100 devices.
+Under such conditions, the metric extraction stack was able to extract features from 1s worth of raw data in $800us$ running on a single core.
+Since metric extraction has no inter-device data dependencies, a modern 8 core CPU we can expect to be able to extract features from 1000 devices.
+If an OPQ Box sensor is used with 16 bit samples and 12kSps ADC, aggregate bandwidth for such system is 10.8Gbps, which is well within the realm of a collocated server with dual 10Gbps network interfaces.
+$C_{detection}$ cost can be made linear with the number of devices in a simple case.
+If a rolling window is applied to metrics as they are generated.
+Raw data from all devices contained in the window with an offending threshold metric can be retained for later analysis.
+While simple, this method will collect all of the gridwide events along with a large number of false positives.
+In synthetic benchmarks, the $C_{detection}$ made up less then $0.01\%$ of the computational cost when compared to $C_{feature\_extraction}$
+and does not significantly contribute to the $C_{total}$.
 
-Self triggered method cuts down the amount of raw data that will be processed from each individual device by a factor of 25.
-This means that metric extraction step computational resource consumption is reduced by the same factor.
-Self triggered method can support up 2500 devices on a modern 8 core CPU.
 
-Finally, Napali further reduces the metric extraction cost by filtering out local noise from the gridwide events.
-A further 440\% efficiency from data size reduction results in a scalability improvements of 10000\% over the naive method.
-As such a single 8 core CPU can support metric extraction for 10000 devices.
-This can allow a single server running metric extraction to provide 5\% coverage of households in the city of Honolulu.
-It is important to consider, that Napali already posses low fidelity metrics for every event it collects.
-This in turn can also improve the scalability of Napali.
-For example a common fundamental frequency extraction involves fitting a sine wave to the voltage waveform.
-By using the coarse metric transmitted by the device, the fitter has a better initial condition, and thus will converge faster.
+In contrast to the Naive method, the self triggered method, has no sink processing requirements, since all of the feature-extraction is performed on the edge device.
+Thus, self triggered method event detection is only limited by the available network bandwidth.
 
+Napali, being a hybrid of Naive and self triggered methods, moves the $C_{metric\_extraction}$ cost to the edge devices, while retaining
+the $C_{detection}$ at the sink.
+Unlike the Naive case, napali perform additional computations on the features in order to detect sub-threshold events, while excluding the local noise.
+However, even with additional metric analysis, the Napali stack was able to process synthetic data from 100000 devices on a single core of an a Intel Core i9-8950HK CPU.
+This will allow a single server running Makai to provide 50\% coverage of households in the city of Honolulu.
+
+The final step of any power quality analysis stack is event classification.
+Every event, collected by an event detection system must be analyzed and classified according to their severity and type.
+While Makai/Napali are not responsible for event classification, it is important to consider the event classification cost when discussing sink processing requirements.
+In the case of the Naive method, events which are detected are a mix of local and global events.
+However, every local event will contain data from every device on the network.
+For the self triggered method, only the events which cross the threshold will be considered for classification.
+While self triggered events will not contain false positives, and sub-threshold events, they will be for the most part comprised of local disturbances.
+Finally, Napali produces high quality events which only contain high fidelity sub and over threshold events, while ignoring local disturbances.
+During the campus deploymet Napali detected 302 Events comprised of 1561 individual device waveforms a week on average.
+The self triggered method detected 26520 offending waveforms.
+If we assume unitary classification cost, classification computational requirements for one week of data are shown in Figure \ref{expdes:fig:classification}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/napali_eval/classification_cost.pdf}
+    \caption{Classification cost based on the expected amount of waveforms for the three considered methods.}
+    \label{expdes:fig:classification}
+\end{figure}
 
 
 \subsection{Effects of latency in the Napali framework} \label{iexp:sec:lat}
