@@ -89,13 +89,17 @@ As such, the figure of $\sigma=0.125V$ should be considered valid for the OPQBox
 Since this metric is only used in transient detection and not characterization, it was found to be sufficient.
 
 \section{Napali Validation}\label{sec:napali-validation.}
-Napali method was validated using simulation, synthetic data with the device-in-loop, and in-situ during the deployment.
-The main tunable parameter in the napali is the $\alpha$ coefficient used in the low pass filter as shown in Equation \ref{eq:iir_mean}.
+
+Napali was validated using simulation, synthetic data with the device-in-loop, and in-situ during the deployment.
+
+
+\subsection{Selection of $\alpha$ parameter}\label{subsec:selectrion-ofparameter}
+
+The main tunable parameter in Napali is the $\alpha$ coefficient used in the low pass filter as shown in Equation \ref{eq:iir_mean}.
 This parameter determines the memory of the lowpass filter used in the calculation of the mean and the standard deviation of metrics from OPQBox data stream.
 These statistics are in turn used during the Napali triggering process to locate sub-threshold gridwide events.
 
-\subsection{Selection of $\alpha$ parameter}\label{subsec:selectrion-ofparameter}
-Smaller $\alpha$ parameter corresponds to a longer memory in the low pass filter as shown in Equation \ref{eq:iir_alpha}.
+A smaller $\alpha$ parameter corresponds to a longer memory in the low pass filter as shown in Equation \ref{eq:iir_alpha}.
 This is further visualized in Figure \ref{fig:expdes:5}.
 In particular this Figures \ref{fig:expdes:5:1} and \ref{fig:expdes:5:2} show the response of the IIR low pass filter to the simulated frequency measurements.
 The dashed red line represents the frequency measurement, solid red line represents the filtered mean, and the blue line represents the standard diviation.
@@ -135,20 +139,20 @@ This is demonstrated in Figure \ref{fig:expdes:6}.
 This graph represents the amount of time that Napali considered one of the metrics to be outside of the $3\sigma$ of the mean for various values of $\alpha$.
 The triggering stream used to generate these values was captured over 24 hours by one of the OPQBoxes deployed on the University of Hawaii campus.
 All devices deployed thus far have followed a similar pattern.
-With $200s <T_{memory} < 2Hr$ the triggering stream resulted in similar behaviour, with the system correctly marking all potential sub-threshold events.
-At $T_{memory} \approx 500s$, system quickly recovered from large jumps in the triggering stream, however it marked a significant number of small anomalies ($\Delta_{f}>0.01Hz$, $\Delta_{v}> 0.1V$\ldots etc) as outside $3\sigma$, and thus candidates for sub-threshold events.
+With $20s <T_{memory} < 2Hr$ the triggering stream resulted in similar behaviour, with the system correctly marking all potential sub-threshold events.
+At $T_{memory} \approx 20s$, system quickly recovered from large jumps in the triggering stream, however it marked a significant number of small anomalies ($\Delta_{f}>0.01Hz$, $\Delta_{v}> 0.1V$\ldots etc) as outside $3\sigma$, and thus candidates for sub-threshold events.
 At $T_{memory} \approx 2Hr$, system took  significant amount of time to recover from large jumps in triggering metrics, thus marking the metric as outside of $3\sigma$ for many tens of minutes.
 Furthermore, some of the larger anomalous measurements ($\Delta_{f}>0.05Hz$, $\Delta_{v}> 2V$\ldots etc) were no longer flagged as sub-threshold candidates.
 Outside of the two extremes, the system behaviour was quite similar.
 During all of the deployments the OPQ system was operating with:
 \begin{equation}\label{eq:opq_alpha}
 \begin{aligned}
-    \alpha = 0.005
+    \alpha = 0.05
 \end{aligned}
 \end{equation}
 
 
-Which corresponds to the $T_{memory} \approx 21$ minutes.
+Which corresponds to the $T_{memory} \approx 2$ minutes.
 Thresholds which initiate the Napali event detection state machine are shown in Table \ref{tbl:opq:thresholds}.
 
 \begin{figure}[h]
@@ -159,7 +163,7 @@ Thresholds which initiate the Napali event detection state machine are shown in 
 \end{figure}
 
 The effect of the of selecting alpha as shown in Equation \ref{eq:opq_alpha} can be observed in Figure \ref{fig:expdes:7}.
-This figure shows interesting features form the same dataset that was used to produce Figure \ref{fig:expdes:6}.
+This figure shows interesting features from the same dataset that was used to produce Figure \ref{fig:expdes:6}.
 Blue traces show metrics that exhibit anomalous behaviour, while red indicates that Napali has flagged this temporal region as a sub-threshold event candidate.
 Figure \ref{fig:expdes:7:1} shows a frequency fluctuation which nearly passes the threshold of $60.1Hz$ which would mark it as a full fledged event.
 Instead, Napali marked almost the entirety of the fluctuation as a potential sub-threshold event, as shown by the red trace.
@@ -212,7 +216,7 @@ Five temporal regions during the the 3 Hrs are marked by Napali as potential sub
 \subsection{Sub-Threshold Event Detection}\label{subsec:sub-threshold-event-detection}
 
 One of the main goals of Napali is to utilize metric extraction in order to detect sub-threshold events.
-During the deployment, two types of subthreshold events have been identified:
+During the deployment, two types of sub-threshold events have been identified:
 \begin{itemize}
     \item Partial sub-threshold event.
     \item Full sub-threshold event.
@@ -220,7 +224,7 @@ During the deployment, two types of subthreshold events have been identified:
 Full sub-threshold events consist of one or several devices passing the threshold described in Table \ref{tbl:opq:thresholds},
 as well as one or several devices marked as sub-threshold by Napali.
 Partial sub-threshold events consist of devices which all passed the threshold described in Table \ref{tbl:opq:thresholds}, however some of the devices triggered on a different metric with a much shorter temporal window.
-The important distinction between partial sub-threshold events and regular events is that if triggered using the self-triggering method, the majority of the sub-threshold data would be lost.
+The important distinction between partial sub-threshold events and regular events is that if triggered using the Self-Triggering method, the majority of the sub-threshold data would be lost.
 
 \begin{figure}[h]
     \centering
@@ -288,13 +292,14 @@ This is particularly evident in the mild transient observed in Figure \ref{fig:e
 \section{University of Hawaii Deployment.}\label{sec:university-of-hawaii-deployment.}
 
 As part of the Napali validation, the OPQ system was deployed across the University of Hawaii Manoa campus (UH).
-This location was ideal because it is an isolated microgrid connected to the Oahu powergrid only via a single 46kV feeder as shown in Figure~\ref{expdes:fig:1}.
+This location was advantageous because it is an isolated microgrid connected to the Oahu powergrid only via a single 46kV feeder as shown in Figure~\ref{expdes:fig:1}.
 Another advantage of the UH campus is the high number of smart meters deployed across various levels of the power delivery infrastructure.
 While the purpose of these meters is monitoring the power consumption, they do include some rudimentary power quality monitoring capabilities.
-Data from the campus deployed meters was used as ground truth for comparison against the measurements, and analysis performed by the OPQ project.
-The location of smart meters in the grid topology is shown in figure~\ref{expdes:fig:1} as the $M$ nodes.
+Data from the campus deployed meters was used as ground truth for comparison against the measurements, and for analysis performed by the OPQ project.
+The location of smart meters in the grid topology is shown in Figure~\ref{expdes:fig:1} as the $M$ nodes.
 As evident by the meter location none of them were monitoring the consumer level power and mainly focused on the higher voltage power delivery.
 This placement was a consequence of the smart meters role as a consumption monitor, and thus the deployment of the OPQ Boxes at the residential level complimented UH power quality monitoring capabilities without introducing redundancies.
+
 University of Hawaii power grid is supplying a highly diverse infrastructure.
 Beyond the traditional residential equipment such as computers and consumer grade electronics, the UH power grid powers scientific and laboratory equipment, machine shops, and server farms.
 All of these elements have varying requirements/tolerances for power quality anomalies as well as different levels of power quality ``pollution''.
@@ -307,7 +312,7 @@ For example, the free electron laser located in the Watanabe Hall is one of the 
     \label{expdes:fig:1}
 \end{figure}
 
-There were 74 smart meters deployed across the UH campus.
+There are 74 smart meters deployed across the UH campus.
 These meters measured the fundamental frequency $V_{rms}$, power consumption, reactive power, and power factor.
 Data from these meters was cross-referenced with the Napali detection system in order to ascertain it's benefits.
 
@@ -347,21 +352,21 @@ It was only detected due to the sub-threshold detection ability of the Napali fr
 
 \clearpage
 
-\subsection{Napali Bandwidth usage} \label{iexp:sec:band}
-During the OPQ deployment It was found that Napali significantly outperformed both the self-triggered and the Naive event detection methods.
-In order to evaluate the bandwidth performance of Napali a self-triggered plugin was ran along side it inside the Makai host.
+\subsection{Napali Bandwidth usage}\label{subsec:napali-bandwidth-usage}
+During the OPQ deployment it was found that Napali significantly outperformed both the Self-Triggered and the Naive event detection methods.
+In order to evaluate the bandwidth performance of Napali a Self-Triggered plugin ran along side it inside the Makai host.
 This plugin utilized the same thresholds as Napali as described in Table \ref{tbl:opq:thresholds}.
-However the self-triggered plugin did not take into the account any inter-device signatures.
+However, the Self-Triggered plugin did not take into the account any inter-device signatures.
 This method is equivalent to each the device performing non-collaborative triggering.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\linewidth]{img/napali_eval/napali_request_bandwidth.pdf}
-    \caption{Amount of data requested from 10 OPQ Boxes via the self-triggered and Napali methods.}
+    \caption{Amount of data requested from 10 OPQ Boxes via the Self-Triggered and Napali methods.}
     \label{expdes:fig:self_triggered_bandwidth}
 \end{figure}
 
-Figure \ref{expdes:fig:self_triggered_bandwidth} shows the amount of data requested from 10 devices by the self-triggered and Napali plugins over 24 Hours.
-It is evident, that the majority of data requests for the self-triggered method resulted in local noise, and did not contribute to the grid measurements.
+Figure \ref{expdes:fig:self_triggered_bandwidth} shows the amount of data requested from 10 devices by the Self-Triggered and Napali plugins over 24 Hours.
+It is evident, that the majority of data requests for the Self-Triggered method resulted in local noise, and did not contribute to the grid measurements.
 Napali on the other hand, ignored anomalies which did not affect more then a single device, while requesting sub-threshold data during a gridwide PQ event.
 
 \begin{figure}[h]
@@ -384,28 +389,28 @@ Napali on the other hand, ignored anomalies which did not affect more then a sin
     \label{expdes:fig:napali_bandwidth_penalty}
 \end{figure}
 
-It should be noted that the self-triggered method does not incur the penalty of having to constantly transmit the device metrics to the sink, since all the event detection is performed on the device.
+It should be noted that the Self-Triggered method does not incur the penalty of having to constantly transmit the device metrics to the sink, since all the event detection is performed on the device.
 Figure \ref{expdes:fig:napali_metric_bandwidth} shows the amount of data received via metrics from 10 OPQ Boxes during the same 24 hours as the Figure \ref{expdes:fig:self_triggered_bandwidth}.
 As expected the bandwidth requirement for metric transmission remains constant, since all OPQ Boxes send the metrics at fixed intervals.
-While this penalty is significant as it constitutes 41\% of the total bandwidth used by Napali, the aggregate bandwidth is still shows a 440\% improvement over the self-triggered method.
+While this penalty is significant as it constitutes 41\% of the total bandwidth used by Napali, the aggregate bandwidth is still shows a 440\% improvement over the Self-Triggered method.
 Another penalty incurred by Napali is the two way communication requirement.
 Each device which participated the event detection needed to receive a command with the temporal range which anomalous data.
-Neither the naive nor self-triggered methods require two-way communication, and as such there is no direct comparison to Napali.
+Neither the Naive nor Self-Triggered methods require two-way communication, and as such there is no direct comparison to Napali.
 Figure \ref{expdes:fig:napali_cmd_bandwidth} shows the command bandwidth consumption for 10 OPQ Boxes across 24 hours.
 The total consumption was ~50kB, which is quite trivial for any modern sensor network.
 
-During the 24 hours of shown in Figures \ref{expdes:fig:napali_bandwidth_penalty} and \ref{expdes:fig:self_triggered_bandwidth}, Napali captured 60 events, while the self-triggered method captured 878.
-The average length of the Napali Event was 10s to the self-triggered 3s.
+During the 24 hours of shown in Figures \ref{expdes:fig:napali_bandwidth_penalty} and \ref{expdes:fig:self_triggered_bandwidth}, Napali captured 60 events, while the Self-Triggered method captured 878.
+The average length of the Napali Event was 10s to the Self-Triggered 3s.
 Of 60 Napali events, all 60 contained sub-threshold data.
 
-Comparison of Napali with the naive method was performed analytically.
+Comparison of Napali with the Naive method was performed analytically.
 Since the sampling rate of the OPQ Box is well characterized, and the number of OPQ Boxes is fixed, it is trivial to calculate the amount of raw data generated by the OPQ network during any time period.
 In order to make this comparison fair, the raw data bandwidth will be scaled by the compression ratio of the state of the art compression algorithm specifically designed for power quality measurements.\cite{zhang2009new}
 Operating at 12kSps, OPQ Box produces raw data at 24KB/s.
 With state of the art compression operating at 90\% compression ratio and 5\% overhead of meta-data, one can expect a ~3KB/s stream of raw data for each OPQ box if it were to send the entirety of it to the sink.
 For 10 OPQ Boxes we would expect the aggregate bandwidth of 30kB/s, and as such the bandwidth consumption 24.7GB/day.
 During a 24 hour period, as shown in Figures \ref{expdes:fig:napali_bandwidth_penalty} and \ref{expdes:fig:self_triggered_bandwidth}, Napali used 234MB of bandwidth.
-This corresponds to an over 100x improvement over the naive method.
+This corresponds to an over 100x improvement over the Naive method.
 
 \begin{figure}[h]
     \centering
@@ -414,14 +419,14 @@ This corresponds to an over 100x improvement over the naive method.
     \label{expdes:fig:bandwidth_master_comparison}
 \end{figure}
 
-Figure \ref{expdes:fig:bandwidth_master_comparison} shows the comparison between Napali as well as the naive and self-triggered methods.
+Figure \ref{expdes:fig:bandwidth_master_comparison} shows the comparison between Napali as well as the Naive and Self-Triggered methods.
 While Napali incurs additional costs described in Figure \ref{expdes:fig:napali_bandwidth_penalty} it outperforms the comparable methods.
 Finally, the cost of the two way communication as shown in Figure \ref{expdes:fig:napali_cmd_bandwidth} is greatly outweighed by the bandwidth savings in the raw data reception.
 Modern sensor networks greatly benefit from two way communication, as it allows on-demand health monitoring, and software updates.
 With addition of Napali, two way communication allows for significant bandwidth requirement reduction in for the sensor network as a whole.
 
-\subsection{Sink processing requirement under the Napali Framework} \label{iexp:sec:scale}
-Sink processing requirements for event detection between self-triggered, Naive and Napali are quite different.
+\subsection{Sink processing requirement under the Napali Framework}\label{subsec:sink-processing-requirement-under-the-napali-framework}
+Sink processing requirements for event detection between Self-Triggered, Naive and Napali are quite different.
 In general the processing requirement can be described as follows:
 \begin{equation}\label{eq:detection_cost}
 \begin{aligned}
@@ -430,17 +435,19 @@ In general the processing requirement can be described as follows:
 \end{equation}
 
 In the Equation \ref{eq:detection_cost} the $C_{total}$ is the total cost, $C_{metric\_extraction}$ is the cost of extracting metrics and $C_{detection}$ is the cost of event detection.\cite{de2015effective}
-Each of the three methods, Napali, self triggered, and Naive, has different sink costs associated with each parameter.
+Each of the three methods, Napali, Self-Triggered, and Naive, has different sink costs associated with each parameter.
 
-First, lets consider the Naive method.
+\subsubsection{Sink processing: Naive Method}
+
+First, let's consider the Naive method.
 In this case all of the metrics need to be extracted at the sink.
-Disregarding the processing power required to keep up with the data rate described in Section \ref{iexp:sec:band} the $C_{feature\_extraction}$ can be measured imperially.
-In order perform this measurement, OPQ Box software was build for an x86 architecture and stress-tested.
+Disregarding the processing power required to keep up with the data rate described in Section \ref{iexp:sec:band} the $C_{feature\_extraction}$ can be measured empirically.
+In order perform this measurement, OPQ Box software was built for an x86 architecture and stress-tested.
 Instead of acquiring data from a device driver, the feature extraction stack was supplied with synthetic data.
 Finally, the ZMQ communication was removed and replaced with the performance analysis code.
 Stress test was performed on a Intel Core i9-8950HK CPU with thermal management disabled running at 2.9GHz.
 Under such conditions, the metric extraction stack was able to extract features from 1s worth of raw data in $800us$ running on a single core.
-Since metric extraction has no inter-device data dependencies, a modern 8 core CPU we can expect to be able to extract features from 1000 devices.
+Since metric extraction has no inter-device data dependencies, a modern 8 core CPU can expect to keep up with feature extraction from 1000 devices.
 If an OPQ Box sensor is used with 16 bit samples and 12kSps ADC, aggregate bandwidth for such system is 10.8Gbps, which is well within the realm of a collocated server with dual 10Gbps network interfaces.
 $C_{detection}$ cost can be made linear with the number of devices.
 If a rolling window is applied to metrics as they are generated, raw data from all devices contained in the window with an offending threshold metric can be retained for later analysis.
@@ -448,26 +455,31 @@ While simple, this method will collect all of the gridwide events along with a l
 In synthetic benchmarks, the $C_{detection}$ made up less then $0.01\%$ of the computational cost when compared to $C_{feature\_extraction}$
 and does not significantly contribute to the $C_{total}$.
 
+\subsubsection{Sink Processing: Naive Method}
 
-In contrast to the Naive method, the self triggered method, has no sink processing requirements, since all of the feature-extraction is performed on the edge device.
-Thus, self triggered method event detection is only limited by the available network bandwidth.
+In contrast to the Naive method, the Self-Triggered method, has no sink processing requirements, since all of the feature-extraction is performed on the edge device.
+Thus, Self-Triggered method event detection is only limited by the available network bandwidth.
 
-Napali, being a hybrid of Naive and self triggered methods, moves the $C_{metric\_extraction}$ cost to the edge devices, while retaining
+\subsubsection{Sink Processing: Napali Method}
+
+Napali, being a hybrid of Naive and Self-Triggered methods, moves the $C_{metric\_extraction}$ cost to the edge devices, while retaining
 the $C_{detection}$ at the sink.
-Unlike the Naive case, napali perform additional computations on the features in order to detect sub-threshold events while excluding the local noise.
+Unlike the Naive case, napali performs additional computations on the features in order to detect sub-threshold events while excluding the local noise.
 However, even with additional metric analysis the Napali stack was able to process synthetic data from 100000 devices on a single core of an a Intel Core i9-8950HK CPU.
 This would allow a single server running Makai to provide 50\% coverage of households in the city of Honolulu.
+
+\subsubsection{Sink Processing: Event Classification}
 
 The final step of any power quality analysis stack is event classification.
 Every event collected by an event detection system must be analyzed and classified according to their severity and type.
 While Makai/Napali are not responsible for event classification it is important to consider the event classification cost when discussing sink processing requirements.
 In the case of the Naive method, events which are detected are a mix of local and global events.
 However, every event will contain a waveform from every device on the network.
-For the self triggered method, only the events which cross the threshold will be considered for classification.
-While self triggered events will not contain false positives and sub-threshold events, vast majority of acquired waveforms are comprised of local disturbances.
+For the Self-Triggered method, only the events which cross the threshold will be considered for classification.
+While Self-Triggered events will not contain false positives and sub-threshold events, vast majority of acquired waveforms are comprised of local disturbances.
 Finally, Napali produces high quality events which only contain high fidelity sub and over threshold events, while ignoring local disturbances.
 During the campus deployment Napali detected 302 Events comprised of 1561 individual device waveforms a week on average.
-The self triggered method detected 26520 offending waveforms.
+The Self-Triggered method detected 26520 offending waveforms.
 If we assume unitary classification cost, classification computational requirements for one week of data are shown in Figure \ref{expdes:fig:classification}.
 \begin{figure}[h]
     \centering
@@ -477,7 +489,7 @@ If we assume unitary classification cost, classification computational requireme
 \end{figure}
 
 
-\subsection{Effects of latency in the Napali framework} \label{iexp:sec:lat}
+\subsection{Effects of latency in the Napali framework}\label{subsec:effects-of-latency-in-the-napali-framework}
 
 In order to understand the effects of latency on Makai in the OPQ deployment, we examined the event length and round trip latency for OPQ Boxes.
 These parameters are shown in Figure \ref{expdes:fig:el_la}.
@@ -532,9 +544,9 @@ Under abnormal conditions, such as a WIFI drop, the maximum delay may be on the 
 \end{figure}
 
 
-Device latency has a different effect on Napali, Naive and self-triggered methods.
-The self-triggered method is completely unaffected by latency, since event detection is performed entirely on the device.
-Naive method, is affected the most, since the sink performs all of the event detection computations.
+Device latency has a different effect on Napali, Naive and Self-Triggered methods.
+The Self-Triggered method is completely unaffected by latency, since event detection is performed entirely on the device.
+The Naive method is affected the most, since the sink performs all of the event detection computations.
 In this case if latency is asymmetric across the devices, and the device with the highest latency observes an over-threshold condition,
 there is potential for waveforms from the rest of the network to get falsely discarded.
 Napali only requires metrics for anomaly detection, and as such, the sink does not need to buffer raw data in anticipation of a potential event.
@@ -553,7 +565,91 @@ The amount of memory required for each device can be derived by analysing the me
 In the case of OPQ each measurement is 24bytes in size and they are transmitted at 1 measurement per second resulting in the total memory consumption of 84kB for 1 hour of metric storage.
 A modest server can support Napali/Makai with 100000 devices while utilising 8GB of memory for 1 hour of metric storage, a 100 times improvement over the Naive method only buffering 5 minutes of raw waveforms.
 
-\subsection{Temporal locality triggering of the Napali framework} \label{iexp:sec:loc}
+
+\subsection{Summary of Computational and Network Resource Utilisation}\label{subsec:summary-of-computational-and-network-recource-utilisaztion}
+
+Sections \ref{subsec:napali-bandwidth-usage}, \ref{subsec:sink-processing-requirement-under-the-napali-framework} and \ref{subsec:effects-of-latency-in-the-napali-framework} describe the computational utility of the Napali framework, when compared to the Naive and Self-Triggered methods.
+Using the insights described above we can compare the number of devices that the three methods in question can support on a modest collocated server.
+Our hypothetical server is a 4 core machine, with each core equivalent to an Intel i9-8950HK we have been using for benchmarking.
+It is further equipped with 8GB of random access memory and a single symmetric 1Gb uplink to OPQ devices.
+For comparison we consider the three metrics described above: bandwidth, computational cost and memory utilization.
+When comparing network computational cost, the classification cost is not considered, since these results illustrate the cost of the event detection only.
+
+\begin{center}
+    \begin{table}[!ht]
+        \caption{Method comparison for a typical collocated server: Bandwidth}
+        \label{tbl:expdes:bandwidth}
+        \begin{tabularx}{\textwidth}[t]{sssb}
+             &\textbf{Napali} &\textbf{Self-Triggered} &\textbf{Naive}  \\
+            \arrayrulecolor{black}\hline
+            \textbf{\# of devices} &44000 & 10000 & 800\\
+            \arrayrulecolor{black}\hline
+        \end{tabularx}
+    \end{table}
+\end{center}
+
+Table \ref{tbl:expdes:bandwidth} describes the bandwidth limitation across the three methods, assuming no overhead and 100\% utilization on the 1Gb link.
+Napali is a clear winner in this case, since it is able to to support significantly more devices before becoming bandwidth limited.
+
+\begin{center}
+    \begin{table}[!ht]
+        \caption{Method comparison for a typical collocated server: CPU}
+        \label{tbl:expdes:cpu}
+        \begin{tabularx}{\textwidth}[t]{sssb}
+            &\textbf{Napali} &\textbf{Self-Triggered} &\textbf{Naive}  \\
+            \arrayrulecolor{black}\hline
+            \textbf{\# of devices} &400000 & $\infty$ & 1000\\
+            \arrayrulecolor{black}\hline
+        \end{tabularx}
+    \end{table}
+\end{center}
+
+Table \ref{tbl:expdes:cpu} describes the CPU limitation across three methods, assuming 100\% CPU utilization on all 4 cores.
+In the Self-Triggered method, event detection is performed entirely on the device, so it incurs no CPU cost.
+However, the cost of event detection with Napali is so low, that it hardly affects it's utility.
+Naive method fairs the worst between the three since it relegates all of the event detection cost to the sink.
+
+\begin{center}
+    \begin{table}[!ht]
+        \caption{Method comparison for a typical collocated server: Memory}
+        \label{tbl:expdes:memory}
+        \begin{tabularx}{\textwidth}[t]{sssb}
+            &\textbf{Napali} &\textbf{Self-Triggered} &\textbf{Naive}  \\
+            \arrayrulecolor{black}\hline
+            \textbf{\# of devices} &100000 & $\infty$ & 1000\\
+            \arrayrulecolor{black}\hline
+        \end{tabularx}
+    \end{table}
+\end{center}
+
+Table \ref{tbl:expdes:memory} describes the memory limitations across the three methods, assuming 100\% memory utilization.
+Again, with no sink requirements, the Self-Triggered method requires no memory buffer for event detection.
+Napali buffers 1Hr of metrics in order to accommodate on devices with excessive latency and handle network faults.
+Naive method must maintain a buffer of raw waveforms on the sink, which leads to a memory bottleneck while only maintaining a 5 minute buffer.
+
+\begin{center}
+    \begin{table}[!ht]
+        \caption{Method comparison for a typical collocated server: Worst of all metrics}
+        \label{tbl:expdes:final_utilisation}
+        \begin{tabularx}{\textwidth}[t]{sssb}
+            &\textbf{Napali} &\textbf{Self-Triggered} &\textbf{Naive}  \\
+            \arrayrulecolor{black}\hline
+            \textbf{\# of devices} &44000 & 10000 & 800\\
+            \arrayrulecolor{black}\hline
+        \end{tabularx}
+    \end{table}
+\end{center}
+
+Table \ref{tbl:expdes:final_utilisation} describes the final tally across the three methods.
+It illustrates how many devices our hypothetical collocated server can handle before becoming limited in one of three metrics.
+All three methods are limited by the bandwidth, however, even with additional bandwidth the Naive method would quickly run out of computational resources to keep up with the data stream.
+As such, when it comes to efficiency of gridwide monitoring Napali is a clear winner suitable for deployment across the a large portion of grid endpoints.
+Self-Triggered method is close second, but as we will see in the next two sections, it performes poorly when it comes to detection efficiency.
+Finally, Naive method is the most computationally expensive at the sink.
+However, it is also the most robust when it comes to event detection, both local and gridwide.
+As such, the Naive method is best left for monitoring high value infrastructure such as substations and production centers which can afford the additional computational and bandwidth cost.
+
+\subsection{Temporal locality triggering of the Napali framework} \label{subsec:temporal-locality-triggering-of-the-napali-framework}
 Once the OPQ Box is fully validated and the Makai detection thresholds are tuned using synthetic datasets, the Napali system will be fully deployed at the University of Hawaii at Manoa.
  Every time the Napali detects an event, both OPQ Boxes and building meters will be queried for data.
  While it may be unfeasible to query raw data from the UH metering infrastructure, metrics are readily available.
@@ -571,13 +667,13 @@ False negatives on the other hand are the primary metric subject to optimization
 Ideally a zero rate of false positives would be expected, however as with any real-world system I do not expect that to be the case.
 This evaluation will determine the triggering efficiency of the Napali framework when compared to the detection ability of a commercially available system.
 
-\subsection{Sub-threshold Data Acquisition} \label{iexp:sec:sub}
+\subsection{Sub-threshold Data Acquisition}\label{subsec:sub-threshold-data-acquisition}
 The Napali methodology will be compared with the single point anomaly detection approach.
 In order to do that I will compare the extent to which sub-threshold events are missed by the UH metering infrastructure.
 In a large distributed event, if a portion of events are not detected by the UH meter's single point detection, but picked up by the Napali framework, these events will be flagged and analyzed for their merit.
 This will in turn provide a metric of distributed detection ability of the Napali framework compared to commercial system.
 Furthermore, for a portion of the deployment the triggering stream from the OPQ Boxes will be stored along with the acquired raw data.
-The triggering stream can be used to compute which fraction of devices would have self triggered if operating autonomously.
+The triggering stream can be used to compute which fraction of devices would have Self-Triggered if operating autonomously.
 This will provide the baseline for sub-threshold triggering efficiency of the Napali system, with respect to the single point detection ability of the OPQ Box.
 
 This evaluation will compare Napali performance to the single point detection mechanisms currently in deployment.
