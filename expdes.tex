@@ -650,22 +650,142 @@ However, it is also the most robust when it comes to event detection, both local
 As such, the Naive method is best left for monitoring high value infrastructure such as substations and production centers which can afford the additional computational and bandwidth cost.
 
 \subsection{Temporal locality triggering of the Napali framework} \label{subsec:temporal-locality-triggering-of-the-napali-framework}
-Once the OPQ Box is fully validated and the Makai detection thresholds are tuned using synthetic datasets, the Napali system will be fully deployed at the University of Hawaii at Manoa.
- Every time the Napali detects an event, both OPQ Boxes and building meters will be queried for data.
- While it may be unfeasible to query raw data from the UH metering infrastructure, metrics are readily available.
- This data will be used to ascertain the proportion of false positive events detected by Napali.
- Additionally, the internal single point fault detection mechanism of the UH power meters will be used in conjunction with the events detected by Napali to measure the rate of false negative events.
- Both the false negative and false positive measurements will be used to ascertain the detection efficient of the Napali framework.
- This analysis will also include an evaluation  of Napali's ability to reject single point anomalies.
- For a portion of OPQ deployment, every event triggered by a single device will be captured.
- These events will be analyzed in order to determine if a gridwide anomaly was incorrectly classified as a single point disturbance.
+As mentioned previously, during the University of Hawaii deployment the OPQ network worked along side the utility grade meters embedded in the University power delivery infrastructure.
+Data from these devices provided the ground truth when it came to evaluating OPQ power quality anomaly detection.
+Before we delve deeper into that, ww will compare the OPQ Box and utility meter metric extraction capability.
 
-The goal of Napali is not to to provide a zero false positive rate.
-Once raw data is stored, higher level processing can further filter and classify it using more computationally expensive techniques.
-As long as the bandwidth consumption of Napali compares favorably to sending the entirety of raw data to the sink, any rate of false positives can be tolerated.
-False negatives on the other hand are the primary metric subject to optimization.
-Ideally a zero rate of false positives would be expected, however as with any real-world system I do not expect that to be the case.
-This evaluation will determine the triggering efficiency of the Napali framework when compared to the detection ability of a commercially available system.
+\subsubsection{Utility meter metric extraction comparison}
+
+8 OPQ devices were collocated with the along with the smart utility meter capable of logging power quality metrics.
+This analysis focuses on Device 1000 along with smart utility meter labeled POST\_MAIN\_2 which is located upstream of Device 1000.
+POST\_MAIN\_2 is monitoring 480V line going into the Pacific Ocean and Science Building prior to it's conditioning and steped down into the dometic 120V.
+
+\paragraph{Frequency:}
+A plot of 1 week of frequency measurements collected by the OPQ Box 1000 and POST\_MAIN\_2 is shown in Figure \ref{expdes:fig:postmain2:freq}.
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/napali_eval/gt/gt_frequency.pdf}
+    \caption{Frequency metric for the POST\_MAIN\_2 utility meter and OPQ Box 1000.}
+    \label{expdes:fig:postmain2:freq}
+\end{figure}
+
+OPQ Box and the utility meter track the fundamental frequency across all devices throughout the entire deployment.
+This is expected since the fundamental frequency must be stable across the entire grid in order for it to operate properly
+This parity is further demonstrated in Figure \ref{expdes:fig:postmain2:freq_diff} where the frequency recorded by the two devices was subtracted from one another.
+These differences were histogramed and statistically analyzed.
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.6\linewidth]{img/napali_eval/gt/gt_f_diff.pdf}
+    \caption{Difference in the frequency metric between POST\_MAIN\_2 utility meter and OPQ Box 1000.}
+    \label{expdes:fig:postmain2:freq_diff}
+\end{figure}
+
+Synthetic benchmarks showed the OPQBox frequency measurement capability on the order of 200x better then the error reported in Figure \ref{expdes:fig:postmain2:freq_diff}.
+This is likely due to the fact that both comparisons are done over 1 minnute averages of frequency, and the offset of where the minnute average starts is not well described in the utility data.
+Regardless with the power quality threshold of $0.1Hz$ an error of two devices with $\sigma=8mHz$ is perfectly acceptable to draw our conclusions regarding the Napali temporal trigger efficiency.
+
+\paragraph{THD:}
+A plot of 1 week of THD measurements collected by the OPQ Box 1000 and POST\_MAIN\_2 is shown in Figure \ref{expdes:fig:postmain2:thd}.
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/napali_eval/gt/gt_thd.pdf}
+    \caption{THD metric for the POST\_MAIN\_2 utility meter and OPQ Box 1000.}
+    \label{expdes:fig:postmain2:thd}
+\end{figure}
+
+Unlike the frequency measurements, THD shows anomalous behaviour during the daylight hours.
+Particularly, form 6:00-18:00 daily the THD measurement diverges by a fraction of a percent between the devices.
+Since the POST\_MAIN\_2 meter is located upstream of Device 1000 on the power grid hierarchy, there is likely a reactive power compensation or a THD filter system positioned between the two devices.
+The fact thea the minute differences in THD are tracked equally well, albeit with an aforementioned offset is particularly interesting.
+This fact if further illustrated in Figure \ref{expdes:fig:postmain2:thd_diff}.
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/napali_eval/gt/gt_thd_diff.pdf}
+    \caption{Difference in the THD metric between POST\_MAIN\_2 utility meter and OPQ Box 1000.}
+    \label{expdes:fig:postmain2:thd_diff}
+\end{figure}
+
+Figure \ref{expdes:fig:postmain2:thd_diff} shows the difference in measurement between the OPQ device and the utility meter.
+In blue are the samples occurring during the seemingly coincidental regions of 18:00-6:00.
+these regions are characterized by an excellent agreement between the two devices, with difference given by $sigma =0.02\%$.
+This level of agreement is comparable to the synthetic benchmarks of the OPQ box with a well calibrated source.
+The red region is the anomalous region, where the two sets of measurements are offset by the $\mu = 0.13\%$.
+Even the accuracy suffered, measurement remained precise down to $\sigma=0.04\%$.
+
+\paragraph{RMS Voltage:}
+A plot of 1 week of \underline{normalized} voltage measurements collected by the OPQ Box 1000 and POST\_MAIN\_2 meter is shown in Figure \ref{expdes:fig:postmain2:rms}.
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/napali_eval/gt/gt_rms.pdf}
+    \caption{RMS metric for the POST\_MAIN\_2 utility meter and OPQ Box 1000.}
+    \label{expdes:fig:postmain2:rms}
+\end{figure}
+
+It should be noted that the $V_{rms}$ for POST\_MAIN\_2 shown in Figure \ref{expdes:fig:postmain2:rms} is not the raw waveform acquired from the meter.
+The raw data consists of the inter-phase across between each leg of the 3 phase system.
+Typically, in order to step down a 3 phase 480V system into a 120V single phase a star or a delta transformer is employed.
+The voltage generated from this transform configuration is a quadrature combination of the three phases \cite{Horowitz:2015:AE:2960712}, thus the voltage displayed in Figure \ref{expdes:fig:postmain2:rms} was in fact:
+
+\begin{equation}\label{eq:v_rms_3phase_to_signle}
+\begin{aligned}
+    V_{rms} = \frac{1}{\sqrt{3}C}\sqrt{V_{ab}^2 + V_{bc}^2 +V_{ca}^2}
+\end{aligned}
+\end{equation}
+where the $V_{ab}$, $V_{bc}$ and $V_{ca}$ are the inter-phase voltages reported by the meter, and C is a constant dependent on the transformer configuration and the final step down voltage.
+In order to make the differences stand out across the two scales Figure \ref{expdes:fig:postmain2:rms} was generated with both data sets normalized.
+A typical step down turn ratio of 480V to 120V is naturally 4:1, which matches quite well with the measured step down factor extracted from the OPQ data and result of Equation \ref{eq:v_rms_3phase_to_signle} of 3.9985:1.
+
+Just as with Frequency and THD metrics we compared the difference between the between the reported voltage by the two devices.
+Equation \ref{eq:v_rms_3phase_to_signle} was used along with the empirically measured $C = 3.9985$ in order to preprocess the POST\_MAIN\_2 dataset.
+The resulting histogram is shown in Figure \ref{expdes:fig:postmain2:rms_diff}
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/napali_eval/gt/gt_rms_diff.pdf}
+    \caption{Difference in the $V_{rms}$ metric between POST\_MAIN\_2 utility meter and OPQ Box 1000.}
+    \label{expdes:fig:postmain2:rms_diff}
+\end{figure}
+
+There were a few outliers, resulting in a poor fit.
+These outliers were likely due to the timing misalignment in the device data.
+While overall timing agrees quite well, the meters report their metric at one minute averages, similar to the OPQ Box.
+However, when the minute begins and ends is quite arbitrary for the OPQ Box, thus resulting in some overlap.
+Regardless, even with the timing discrepancy the voltage metrics agree to an excellent degree across both devices with a $\sigma=0.1V$.
+With the event threshold of $\pm5V$ this level of agreement was found to be acceptable.
+
+\paragraph{Overall metric comparison:}
+Metrics between the utility meter and the OPQ device were found to correlate to a great degree of accuracy.
+Frequency measurements in particular was well formed, with a well characterized gaussian with minimal offset and a $\sigma =8mHz$.
+Total harmonic distortion tracked very well across the devices, with the difference $\sigma < 0.04\%$ in all cases.
+However, additional offset was regularly introduced by some form of harmonic filtering equipment.
+$V_{rms}$ voltage agreement across the two devices suffered the most as expected.
+There is no way to analytically calculate the step down factor between the 480V three phase system and 120V system without taking apart and measuring the power transformer which powers the POST building.
+However the empirically measured turn ratio, matched closely to the expected value.
+Furthermore, two meters were in close agreement at all times with $\sigma =0.1V$ between the two devices.
+This discrepancy was expected, since both devices are influenced by a different noise sources, with the POST\_MAIN\_2 meter noise being a superset of that observed by the OPQ Box 1000.
+The performance of the metric extraction, compared to the utility meter, was found to be satisfactory across the board, making the OPQ Box well suited for grid edge power quality monitoring.
+
+%Once the OPQ Box is fully validated and the Makai detection thresholds are tuned using synthetic datasets, the Napali system will be fully deployed at the University of Hawaii at Manoa.
+% Every time the Napali detects an event, both OPQ Boxes and building meters will be queried for data.
+% While it may be unfeasible to query raw data from the UH metering infrastructure, metrics are readily available.
+% This data will be used to ascertain the proportion of false positive events detected by Napali.
+% Additionally, the internal single point fault detection mechanism of the UH power meters will be used in conjunction with the events detected by Napali to measure the rate of false negative events.
+% Both the false negative and false positive measurements will be used to ascertain the detection efficient of the Napali framework.
+% This analysis will also include an evaluation  of Napali's ability to reject single point anomalies.
+% For a portion of OPQ deployment, every event triggered by a single device will be captured.
+% These events will be analyzed in order to determine if a gridwide anomaly was incorrectly classified as a single point disturbance.
+
+%The goal of Napali is not to to provide a zero false positive rate.
+%Once raw data is stored, higher level processing can further filter and classify it using more computationally expensive techniques.
+%As long as the bandwidth consumption of Napali compares favorably to sending the entirety of raw data to the sink, any rate of false positives can be tolerated.
+%False negatives on the other hand are the primary metric subject to optimization.
+%Ideally a zero rate of false positives would be expected, however as with any real-world system I do not expect that to be the case.
+%This evaluation will determine the triggering efficiency of the Napali framework when compared to the detection ability of a commercially available system.
 
 \subsection{Sub-threshold Data Acquisition}\label{subsec:sub-threshold-data-acquisition}
 The Napali methodology will be compared with the single point anomaly detection approach.
