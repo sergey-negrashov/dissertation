@@ -770,48 +770,231 @@ Furthermore, two meters were in close agreement at all times with $\sigma =0.1V$
 This discrepancy was expected, since both devices are influenced by a different noise sources, with the POST\_MAIN\_2 meter noise being a superset of that observed by the OPQ Box 1000.
 The performance of the metric extraction, compared to the utility meter, was found to be satisfactory across the board, making the OPQ Box well suited for grid edge power quality monitoring.
 
-\subsubsection{Gridwide event extraction from Utility Meters}
-In addition to POST\_MAIN\_2 several other meters are collocated with the OPQ devices.
-The details of this collocation are shown in Table \ref{tbl:expdes:meter_colocation}.
-Data from these collocated meters was used as a basis for evaluation of the temporal locality claim of the Napali framework.
-Napali temporal locality states that by monitoring the edge nodes of the power grid for temporally related disturbances, the state of the power grid can be determined.
-In the next section I show this claim to be true, however, prior to that gridwide events need to be extracted from the Utility meter records.
-
+\subsubsection{Gridwide event extraction from utility meters}
 \begin{center}
     \begin{table}[!ht]
-        \caption{OPQ Box and Utility meter collocation. }
+        \caption{OPQ Box and utility meter collocation. }
         \label{tbl:expdes:meter_colocation}
         \begin{tabularx}{\textwidth}[t]{sb}
             \textbf{OPQ Box ID} &\textbf{Utility Meter}\\
             \arrayrulecolor{black}\hline
             1000, 1002 & POST\_MAIN\_1 \newline
             POST\_MAIN\_2\\
+            \arrayrulecolor{black}\hline
             1001 & HAMILTON\_LIB\_PH\_III\_CH\_1\_MTR \newline
-                    HAMILTON\_LIB\_PH\_III\_CH\_2\_MTR \newline
-                    HAMILTON\_LIB\_PH\_III\_CH\_3\_MTR \newline
-                    HAMILTON\_LIB\_PH\_III\_MAIN\_1\_MTR \newline
-                    HAMILTON\_LIB\_PH\_III\_MAIN\_2\_MTR \newline
-                    HAMILTON\_LIB\_PH\_III\_MCC\_AC1\_MTR \newline
-                    HAMILTON\_LIB\_PH\_III\_MCC\_AC2\_MTR \\
+            HAMILTON\_LIB\_PH\_III\_CH\_2\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_CH\_3\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MAIN\_1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MAIN\_2\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MCC\_AC1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MCC\_AC2\_MTR \\
             \arrayrulecolor{black}\hline
             1003 & KELLER\_HALL\_MAIN\_MTR\\
+            \arrayrulecolor{black}\hline
             1021 & MARINE\_SCIENCE\_MAIN\_A\_MTR \newline
-                    MARINE\_SCIENCE\_MAIN\_B\_MTR \newline
-                    MARINE\_SCIENCE\_MCC\_MTR \\
+            MARINE\_SCIENCE\_MAIN\_B\_MTR \newline
+            MARINE\_SCIENCE\_MCC\_MTR \\
+            \arrayrulecolor{black}\hline
             1022 & AG\_ENGINEERING\_MAIN\_MTR \newline
-                    AG\_ENGINEERING\_MCC\_MTR \\
+            AG\_ENGINEERING\_MCC\_MTR \\
+            \arrayrulecolor{black}\hline
             1023 & LAW\_LIB\_MAIN\_MTR \\
+            \arrayrulecolor{black}\hline
             1025 & KENNEDY\_THEATRE\_MAIN\_MTR \\
         \end{tabularx}
     \end{table}
 \end{center}
+In addition to POST\_MAIN\_2 several other meters were collocated in the same building as an OPQ Box.
+Details of this collocation are shown in Table \ref{tbl:expdes:meter_colocation}.
+Data from these utility meters was used as a basis for evaluation of the temporal locality claim of the Napali framework.
+Napali temporal locality states that by monitoring the edge nodes of the power grid for temporally related disturbances, the state of the power grid can be determined.
+In the next section I show this claim to be true, however, prior to that I demonstrate how gridwide events were extracted from the utility meter records.
 
 As shown in Table \ref{tbl:expdes:meter_colocation} the POST building has two OPQ Devices and two utility meters.
 Furthermore, several OPQ devices are located in buildings with more then one meter.
 Unfortunately, no detailed building schematics were made available to us, thus it is not clear which meter was a parent node of the OPQ Box in the power grid hierarchy.
 
-Grid wide events were collected from the
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=1\linewidth]{img/napali_eval/gt/utility_events_total.pdf}
+    \caption{Total number of gridwide events extracted from the utility power meters from November 15th to December 19th.}
+    \label{expdes:fig:postmain2:utility_event_total}
+\end{figure}
 
+In order to extract anomalies which affected the collocated meters, utility meters from Table \ref{tbl:expdes:meter_colocation} were queried for metrics from November 15th 2019 to December 19th 2019.
+These metrics contained minute windowed average, minimum and maximum values for the following power quality measurements:
+\begin{enumerate}
+    \item $V_{rms}(AB)$, $V_{rms}(BC)$, $V_{rms}(CA)$ : RMS value for the inter-phase voltage.
+    \item $f_{fundamental}$ : Fundamental frequency.
+    \item $THD$ : Total harmonic distortion.
+\end{enumerate}
+
+It is unclear which leg of the three phase system the  $f_{fundamental}$ measurement was performed on.
+The THD measurement was likely performed on all three legs and combined together, since it matches closely to the box measurement as shown in Figure \ref{expdes:fig:postmain2:thd} and \ref{expdes:fig:postmain2:thd_diff}.
+Finally, in a few meters lacked the $V_{rms}(AB)$, $V_{rms}(BC)$ and $V_{rms}(AB)$ and instead delivered $V_{rms}(AN)$, $V_{rms}(BN)$, $V_{rms}(CN)$ measurements.
+These measurements are line-to-neutral instead of line to line.
+In these caseses instead of using equation \ref{eq:v_rms_3phase_to_signle}, Equation \ref{eq:v_rms_3phaseN_to_signle} to calculate observed 120V line voltage. \cite{Horowitz:2015:AE:2960712}
+
+\begin{equation}\label{eq:v_rms_3phaseN_to_signle}
+\begin{aligned}
+    V_{rms} = \frac{sqrt{3}}{4}\sqrt{V_{ab}^2 + V_{bc}^2 +V_{ca}^2}
+\end{aligned}
+\end{equation}
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/gt/gt_f_example.pdf}
+        \caption{}
+        \label{expdes:fig:gt_example:f}
+    \end{subfigure}\hspace{5mm}
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/gt/gt_thd_example.pdf}
+        \caption{}
+        \label{expdes:fig:gt_example:thd}
+    \end{subfigure}
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/gt/gt_vpoly_example.pdf}
+        \caption{}
+        \label{expdes:fig:gt_example:vpoly}
+    \end{subfigure}\hspace{5mm}
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/gt/gt_vsingle_example.pdf}
+        \caption{}
+        \label{expdes:fig:gt_example:vsingle}
+    \end{subfigure}
+
+    \caption{Example of the four types of events extracted from utility meter data.
+    a)Fundamental frequency event recorded by POST\_MAIN\_2.
+    b) THD event recorded by HAMILTON\_LIB\_PH\_III\_MAIN\_1.
+    c) Multiphase $V_{rms}$ event as recorded by HAMILTON\_LIB\_PH\_III\_CH\_2.
+    d) Single phase $V_{rms}$ event as recorded by HAMILTON\_LIB\_PH\_III\_CH\_3.}
+
+    \label{expdes:fig:gt_example}
+\end{figure}
+
+Extraction for $f_{fundamental}$ and $THD$ metrics were processed in a similar manner to the OPQ Box events.
+If the minimum or maximum metric exceeded the threshold defined in Table \ref{tbl:opq:thresholds} were surpassed, the temporal region was marked as anomalous.
+If anomalous regions across multiple utility meters were marked, that temporal region was reported as a utility gridwide event.
+$V_{rms}$ measurements were processed in a slightly different manner.
+First, the $V_{rms}$ value as observed by the OPQ devices was calculated from both minimum and maximum of the utility metrics using Equation \ref{eq:v_rms_3phaseN_to_signle} or \ref{eq:v_rms_3phase_to_signle}.
+These values were then treated in the same manner as $f_{fundamental}$ and $THD$.
+Next the individual phases $V_{rms}(AB)$, $V_{rms}(BC)$, $V_{rms}(CA)$ or $V_{rms}(AN)$, $V_{rms}(BN)$, $V_{rms}(CN)$ were thresholded using the same $8\frac{1}{3}\%$ threshold used for the OPQ devices.
+If more then one utility meter observed a single phase sag or swell it was marked as a utility gridwide event.
+
+Total number of events of each type extracted from the utility meters is shown in Figure \ref{expdes:fig:postmain2:utility_event_total}.
+Examples of recorded gridwide events as observed by various meters is shown in Figure \ref{expdes:fig:gt_example}.
+
+\subsubsection{Evaluation of detection capabilities for the Napali framework}
+
+With the gridwide events extracted from the utility meters in the previous section, a detailed evaluation of Napali detection capabilities was carried out.
+Events timestamps which corresponded to the utility meter grid wide events were queried against OPQ event database and analyzed.
+Primarily, if an event was located it was reanalyzed to validate that the metric which triggered the utility meter was the same as the one which triggered the OPQ system.
+
+\paragraph{Frequency Gridwide Events:} Out of 35 gridwide frequency events 34 were detected by Napali.
+As expected, since frequency is quite consistent across the entire power grid, all OPQ devices triggered on the 34 recorded events.
+The missed frequency event occurred on November 25th at 7:08:00 AM which corresponds to a complete 3 minute power outage as shown in Figure \ref{expdes:fig:gt_outage}.
+Unfortunately, by the time the OPQ devices finished their initialization procedure, the grid conditions have returned to normal.
+It should be noted that the outage was recorded and reported by the OPQ system.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/gt/outage_f.pdf}
+        \caption{}
+        \label{expdes:fig:gt_outage:f}
+    \end{subfigure}\hspace{5mm}
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/gt/outage_v.pdf}
+        \caption{}
+        \label{expdes:fig:gt_outage:v}
+    \end{subfigure}
+
+    \caption{November 25th outage as observed by the utility meter POST\_MAIN\_2.
+    a) Observed frequency.
+    b)Observed voltage.}
+
+    \label{expdes:fig:gt_outage}
+\end{figure}
+
+\paragraph{THD gridwide event:} A single THD event extracted from the utility meters was recorded and by the OPQ system with every device sending raw waveforms for the event.
+
+\paragraph{$V_{rms}$ multiphase:} Out of 12 gridwide utility events only 7 were detected by the OPQ system.
+However, a closer examination of missed events revealed a pattern.
+The table of the missed events and their triggered meters is shown in Table \ref{tbl:expdes:v_rms:missed_events}
+
+\begin{center}
+    \begin{table}[!ht]
+        \caption{Missed $V_{rms}$ multiphase utility events. }
+        \label{tbl:expdes:v_rms:missed_events}
+        \begin{tabularx}{\textwidth}[t]{sb}
+            \textbf{Event Timestamp} &\textbf{Triggered utility meter}\\
+            \arrayrulecolor{black}\hline
+            November 26 14:53 & HAMILTON\_LIB\_PH\_III\_CH\_1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_CH\_3\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MCC\_AC1\_MTR  \newline
+            HAMILTON\_LIB\_PH\_III\_MCC\_AC2\_MTR \\
+            \arrayrulecolor{black}\hline
+            November 27 11:15 & 	HAMILTON\_LIB\_PH\_III\_CH\_1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MAIN\_1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_CH\_3\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MCC\_AC1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MCC\_AC2\_MTR \\
+            \arrayrulecolor{black}\hline
+            November 27 11:21 & 	HAMILTON\_LIB\_PH\_III\_CH\_1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MAIN\_1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_CH\_3\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MCC\_AC1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MCC\_AC2\_MTR \\
+            \arrayrulecolor{black}\hline
+            November 27 15:18 & 	HAMILTON\_LIB\_PH\_III\_CH\_1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MAIN\_1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_CH\_3\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MCC\_AC1\_MTR \newline
+            HAMILTON\_LIB\_PH\_III\_MCC\_AC2\_MTR \\
+            \arrayrulecolor{black}\hline
+            November 25, 7:08 & All utility meters. \\
+        \end{tabularx}
+    \end{table}
+\end{center}
+It seems that between 2pm November $26^{th}$ and 3:30pm November $27^{th}$ electrical equipment in Hamilton library was experiencing power quality issues, while the rest of the University power grid exhibited nominal behaviour.
+Since only a single OPQ Device is located in the Hamilton library, Napali rightfully rejected any power quality metrics observed there as local disturbances.
+Finally, November 25, 7:08 signifies the power interruption as discussed previously.
+As such the true utility gridwide event number is 8 with 7 detected using the Napali framework.
+
+\paragraph{$V_{rms}$ single phase:}
+Out of 32 single phase gridwide events, 23 were detected by the Napali framework.
+Similarly to the $V_{rms}$ multiphase events:
+\begin{itemize}
+    \item 1 event was due to the Nov 25 outage.
+    \item 6 events were incorrectly classified as gridwide, since they originated from the same building.
+\end{itemize}
+Two events occurring on November $26^{th}$ 14:53 and November $27^{th}$ 11:15  were missed by the OPQ system.
+These events triggered on all of the Hamilton library meters and the KELLER\_HALL\_MAIN\_MTR located in Keller hall.
+While one of the phases did go bellow the $\approx 8\%$ threshold, it did not cause a large enough disturbance to appear as an anomaly to the keller hall device.
+Furthermore, while these events impacted multiple meters, they during the anomalous period experienced by the Hamilton library subgrid.
+It is unlikely that these events were true gridwide events, but instead the bleed over from the Hamilton library.
+
+\subsubsection{Detection capabilities for the Napali framework}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/napali_eval/gt/money_plot1.pdf}
+    \caption{Comparison of the gridwide events detected by napali and the utility meters.}
+    \label{expdes:fig:gt_money}
+\end{figure}
+
+The events missed due to the power outage could have been remedied by inclusion of a battery in the OPQ Box.
+However, even without the battery, OPQ system was able to correctly identify the power outage.
+Disregarding the multi-utility meter events which originated from the same building, detection performance of the Napali framework is outlined in Figure \ref{expdes:fig:gt_money}.
+This result validates the temporal locality hypothesis.
+Disregarding the event caused by the power outage, Napali showed an over 97\% detection rate for grid wide events.
+The two events that were missed by the Napali framework, only affected a single phase of a neighbouring building, and did not cause significant drop in the observed line voltage.
 
 %Once the OPQ Box is fully validated and the Makai detection thresholds are tuned using synthetic datasets, the Napali system will be fully deployed at the University of Hawaii at Manoa.
 % Every time the Napali detects an event, both OPQ Boxes and building meters will be queried for data.
@@ -831,20 +1014,22 @@ Grid wide events were collected from the
 %This evaluation will determine the triggering efficiency of the Napali framework when compared to the detection ability of a commercially available system.
 
 \subsection{Sub-threshold Data Acquisition}\label{subsec:sub-threshold-data-acquisition}
-The Napali methodology will be compared with the single point anomaly detection approach.
-In order to do that I will compare the extent to which sub-threshold events are missed by the UH metering infrastructure.
-In a large distributed event, if a portion of events are not detected by the UH meter's single point detection, but picked up by the Napali framework, these events will be flagged and analyzed for their merit.
-This will in turn provide a metric of distributed detection ability of the Napali framework compared to commercial system.
-Furthermore, for a portion of the deployment the triggering stream from the OPQ Boxes will be stored along with the acquired raw data.
-The triggering stream can be used to compute which fraction of devices would have Self-Triggered if operating autonomously.
-This will provide the baseline for sub-threshold triggering efficiency of the Napali system, with respect to the single point detection ability of the OPQ Box.
 
-This evaluation will compare Napali performance to the single point detection mechanisms currently in deployment.
-I expect that Napali will outperform these strategies, and provide a more complete picture of gridwide anomalies as they propagate through the UH power grid.
-It is possible that no sub-threshold events will be recorded during the UH deployment.
-UH campus is quite small, perhaps too small for an anomaly in one building not to impact the rest of campus.
-In this case the sub-threshold data acquisition will remain an open topic for future work and a larger geographical deployment.
-Regardless, as long as I am be able to validate the single point anomaly rejection ability of Napali as described in Section~\ref{iexp:sec:loc}, I will be able to conclude that Napali has a distinct advantage over single point detection methods.
-Single point anomalies are not important in smart grid monitoring, since they originate from the consumers side of the meter, and should be ignored.
-In fact, recording these events may be detrimental to the privacy of the end-user, since it may give clues on their activities as shown in Figure~\ref{intro:fig:1} a and b.
-However since privacy implication of power quality monitoring are outside the scope of this project, this study will remain as a point of future work.
+%The Napali methodology will be compared with the single point anomaly detection approach.
+%In order to do that I will compare the extent to which sub-threshold events are missed by the UH metering infrastructure.
+%In a large distributed event, if a portion of events are not detected by the UH meter's single point detection, but picked up by the Napali framework, these events will be flagged and analyzed for their merit.
+%This will in turn provide a metric of distributed detection ability of the Napali framework compared to commercial system.
+%Furthermore, for a portion of the deployment the triggering stream from the OPQ Boxes will be stored along with the acquired raw data.
+%The triggering stream can be used to compute which fraction of devices would have Self-Triggered if operating autonomously.
+%This will provide the baseline for sub-threshold triggering efficiency of the Napali system, with respect to the single point detection ability of the OPQ Box.
+%
+%This evaluation will compare Napali performance to the single point detection mechanisms currently in deployment.
+%I expect that Napali will outperform these strategies, and provide a more complete picture of gridwide anomalies as they propagate through the UH power grid.
+%It is possible that no sub-threshold events will be recorded during the UH deployment.
+%UH campus is quite small, perhaps too small for an anomaly in one building not to impact the rest of campus.
+%In this case the sub-threshold data acquisition will remain an open topic for future work and a larger geographical deployment.
+%Regardless, as long as I am be able to validate the single point anomaly rejection ability of Napali as described in Section~\ref{iexp:sec:loc}, I will be able to conclude that Napali has a distinct advantage over single point detection methods.
+%Single point anomalies are not important in smart grid monitoring, since they originate from the consumers side of the meter, and should be ignored.
+%In fact, recording these events may be detrimental to the privacy of the end-user, since it may give clues on their activities as shown in Figure~\ref{intro:fig:1} a and b.
+%However since privacy implication of power quality monitoring are outside the scope of this project, this study will remain as a point of future work.
+%
