@@ -837,7 +837,7 @@ In these caseses instead of using equation \ref{eq:v_rms_3phase_to_signle}, Equa
 
 \begin{equation}\label{eq:v_rms_3phaseN_to_signle}
 \begin{aligned}
-    V_{rms} = \frac{sqrt{3}}{4}\sqrt{V_{ab}^2 + V_{bc}^2 +V_{ca}^2}
+    V_{rms} = \frac{\sqrt{3}}{4}\sqrt{V_{ab}^2 + V_{bc}^2 +V_{ca}^2}
 \end{aligned}
 \end{equation}
 
@@ -996,40 +996,105 @@ This result validates the temporal locality hypothesis.
 Disregarding the event caused by the power outage, Napali showed an over 97\% detection rate for grid wide events.
 The two events that were missed by the Napali framework, only affected a single phase of a neighbouring building, and did not cause significant drop in the observed line voltage.
 
-%Once the OPQ Box is fully validated and the Makai detection thresholds are tuned using synthetic datasets, the Napali system will be fully deployed at the University of Hawaii at Manoa.
-% Every time the Napali detects an event, both OPQ Boxes and building meters will be queried for data.
-% While it may be unfeasible to query raw data from the UH metering infrastructure, metrics are readily available.
-% This data will be used to ascertain the proportion of false positive events detected by Napali.
-% Additionally, the internal single point fault detection mechanism of the UH power meters will be used in conjunction with the events detected by Napali to measure the rate of false negative events.
-% Both the false negative and false positive measurements will be used to ascertain the detection efficient of the Napali framework.
-% This analysis will also include an evaluation  of Napali's ability to reject single point anomalies.
-% For a portion of OPQ deployment, every event triggered by a single device will be captured.
-% These events will be analyzed in order to determine if a gridwide anomaly was incorrectly classified as a single point disturbance.
-
-%The goal of Napali is not to to provide a zero false positive rate.
-%Once raw data is stored, higher level processing can further filter and classify it using more computationally expensive techniques.
-%As long as the bandwidth consumption of Napali compares favorably to sending the entirety of raw data to the sink, any rate of false positives can be tolerated.
-%False negatives on the other hand are the primary metric subject to optimization.
-%Ideally a zero rate of false positives would be expected, however as with any real-world system I do not expect that to be the case.
-%This evaluation will determine the triggering efficiency of the Napali framework when compared to the detection ability of a commercially available system.
-
 \subsection{Sub-threshold Data Acquisition}\label{subsec:sub-threshold-data-acquisition}
 
-%The Napali methodology will be compared with the single point anomaly detection approach.
-%In order to do that I will compare the extent to which sub-threshold events are missed by the UH metering infrastructure.
-%In a large distributed event, if a portion of events are not detected by the UH meter's single point detection, but picked up by the Napali framework, these events will be flagged and analyzed for their merit.
-%This will in turn provide a metric of distributed detection ability of the Napali framework compared to commercial system.
-%Furthermore, for a portion of the deployment the triggering stream from the OPQ Boxes will be stored along with the acquired raw data.
-%The triggering stream can be used to compute which fraction of devices would have Self-Triggered if operating autonomously.
-%This will provide the baseline for sub-threshold triggering efficiency of the Napali system, with respect to the single point detection ability of the OPQ Box.
-%
-%This evaluation will compare Napali performance to the single point detection mechanisms currently in deployment.
-%I expect that Napali will outperform these strategies, and provide a more complete picture of gridwide anomalies as they propagate through the UH power grid.
-%It is possible that no sub-threshold events will be recorded during the UH deployment.
-%UH campus is quite small, perhaps too small for an anomaly in one building not to impact the rest of campus.
-%In this case the sub-threshold data acquisition will remain an open topic for future work and a larger geographical deployment.
-%Regardless, as long as I am be able to validate the single point anomaly rejection ability of Napali as described in Section~\ref{iexp:sec:loc}, I will be able to conclude that Napali has a distinct advantage over single point detection methods.
-%Single point anomalies are not important in smart grid monitoring, since they originate from the consumers side of the meter, and should be ignored.
-%In fact, recording these events may be detrimental to the privacy of the end-user, since it may give clues on their activities as shown in Figure~\ref{intro:fig:1} a and b.
-%However since privacy implication of power quality monitoring are outside the scope of this project, this study will remain as a point of future work.
-%
+\begin{center}
+    \begin{table}[!ht]
+        \caption{Gridwide events with collocated and non-collocated meters which impacted a portion only a portion of the power grid}
+        \label{tbl:expdes:sub:colononcolo}
+        \begin{tabularx}{\textwidth}[t]{p{2.5cm}|p{2.8cm}|p{7.2cm}|b}
+            \textbf{Time} &\textbf{Collocated } & \textbf{Non-collocated} & \textbf{OPQBox}\\
+            \arrayrulecolor{black}\hline
+            Nov 24 7:57 & POST\_MAIN\_2 & BUS\_AD\_SHIDLER\_MAIN\_MTR \newline
+            ST\_JOHN\_PLANT\_SCIENCE\_MAIN\_MTR \newline
+            MOORE\_HALL\_MAIN\_MTR \newline
+            HPER\_KLUM\_GYM\_MTR \newline
+            MULTIPURPOSE\_BLDG\_MAIN\_MTR \newline &
+            All\\
+            \arrayrulecolor{black}\hline
+
+            Nov 29 6:10 & POST\_MAIN\_2 & MULTIPURPOSE\_BLDG\_MAIN\_MTR &
+            1000 \newline
+            1002 \newline
+            1005 \newline
+            1006 \newline
+            1007 \newline
+            1010 \newline
+            1021 \newline
+            1022 \newline
+            1023 \newline
+            1024 \\
+            \arrayrulecolor{black}\hline
+            Nov 29 16:11 & POST\_MAIN\_2 & BUS\_AD\_SHIDLER\_MAIN\_MTR \newline
+            ST\_JOHN\_PLANT\_SCIENCE\_MAIN\_MTR \newline
+            PHYSICAL\_SCIENCE\_MAIN\_MTR \newline
+            MOORE\_HALL\_MAIN\_MTR \newline
+            HPER\_KLUM\_GYM\_MTR &
+            All\\
+            \arrayrulecolor{black}\hline
+            Dec 14 13:14 & POST\_MAIN\_2 & BUS\_AD\_SHIDLER\_MAIN\_MTR \newline
+            ST\_JOHN\_PLANT\_SCIENCE\_MAIN\_MTR \newline
+            MOORE\_HALL\_MAIN\_MTR \newline &
+            1000 \newline
+            1005 \newline
+            1006 \newline
+            1007 \newline
+            1010 \newline
+            1021 \newline
+            1022 \newline
+            1023 \newline
+            1024\\
+            \arrayrulecolor{black}\hline
+        \end{tabularx}
+    \end{table}
+\end{center}
+
+While the Naive method compares favorably to Napali when it comes to resource consumption as outlined in Section \ref{subsec:summary-of-computational-and-network-recource-utilisaztion}, it lacks the ability to detect portions of gridwide events which are below the device detection threshold.
+Unlike the Naive method, Napli cooperative edge centric event detection attempts to capture both over-threshold and sub-threshold data as described in Section \ref{subsec:napali-trigger}.
+Section \ref{subsec:temporal-locality-triggering-of-the-napali-framework} described the detection capabilities of the OPQ Network and Napali, when detecting gridwide events with consensus of 2 or more utility meters.
+These are the types of events that the Naive and Napali are equally capable of detecting.
+Indeed, the Naive plugin in Makai received data from devices which were collocated with utility meters which observed the disturbance.
+In contrast Napali  captured additional waveforms which corresponded to the sub-threshold portions of each event.
+More interesting however, were the gridwide events which were extracted from all of the utility meters, not just the ones collocated with an OPQ box.
+Particularly, gridwide events which corresponded to one or more collocated utility meter as well as one or more of the non-collocated meters were of particular interest.
+These events are invariably gridwide, since more then one UH Utility meter was affected, however only a subset of OPQ devices would experince the disturbance with an over-threshold severity.
+These events create a basis for sub-threshold data acquisition false negative analysis.
+After all, it is clearly established that these events are gridwide, and affect only a portion of the UH power delivery infrastructure.
+If Napali is capable of locating and acquiring subthreshold portions of these events, it would prove the claim that the subthreshold event acquisition is both a possible and useful tool for power quality analisys.
+
+\subsubsection{False Negative Subthreshold Data Acquisition:}
+Unfortunately, events which impact only a part of the UH power grid with the affected area limited to a region with both collocated and non-collocated meters are quite rare.
+From the data made available to us from the UH Smart meters only 4 such events were identified.
+These events are shown in Table \ref{tbl:expdes:sub:colononcolo}.
+
+It is unclear why these events all seem to have similar parent utilty meters, however one explanation is this portion of the power grid was not well covered by the opq deployment.
+Nonetheless, two of the events have data from every device on the OPQ network.
+The other two events only impacted 9 and 10 out of 15 deployed devices respectively.
+Another peculiarity is that POST\_MAIN\_2 and POST\_MAIN\_1 utility meters service the same building, however, POST\_MAIN\_1 was not affected enough to quality for these events.
+In the next section these events are examined in more detail.
+\paragraph{Event 1(Nov 24 7:57 ):}
+The $V_{rms}$ as converted using Equations \ref{eq:v_rms_3phase_to_signle} and \ref{eq:v_rms_3phaseN_to_signle} for the affected meters is shown in Figure \ref{expdes:fig:sub:ev1:gt}.
+This event was characterized as a large voltage swell, affecting a large portion of the campus.
+The voltage anomaly was significant enough to trigger OPQ Box devices 1006, 1007 and 1002 using the Naive triggering method.
+In contrast to the Napali method triggered all of the UH devices, and captured waveforms shown in Figure \ref{expdes:fig:sub:ev1:boxes}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/napali_eval/subthreshold/ev1/ev1_gt.pdf}
+    \caption{Utility meter data for Event 1}
+    \label{expdes:fig:sub:ev1:gt}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev1/boxes_combined.pdf}
+    \caption{Event Data for event 1.}
+    \label{expdes:fig:sub:ev1:boxes}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev1/map.pdf}
+    \caption{Geospatial representation of event 1.}
+    \label{expdes:fig:sub:ev1:map}
+\end{figure}
