@@ -1073,28 +1073,96 @@ The other two events only impacted 9 and 10 out of 15 deployed devices respectiv
 Another peculiarity is that POST\_MAIN\_2 and POST\_MAIN\_1 utility meters service the same building, however, POST\_MAIN\_1 was not affected enough to quality for these events.
 In the next section these events are examined in more detail.
 \paragraph{Event 1(Nov 24 7:57 ):}
-The $V_{rms}$ as converted using Equations \ref{eq:v_rms_3phase_to_signle} and \ref{eq:v_rms_3phaseN_to_signle} for the affected meters is shown in Figure \ref{expdes:fig:sub:ev1:gt}.
+The $V_{rms}$ as converted using Equations \ref{eq:v_rms_3phase_to_signle} and \ref{eq:v_rms_3phaseN_to_signle} Utility meters composing this event is shown in Figure \ref{expdes:fig:sub:ev1:gt}.
 This event was characterized as a large voltage swell, affecting a large portion of the campus.
-The voltage anomaly was significant enough to trigger OPQ Box devices 1006, 1007 and 1002 using the Naive triggering method.
-In contrast to the Napali method triggered all of the UH devices, and captured waveforms shown in Figure \ref{expdes:fig:sub:ev1:boxes}.
+The voltage anomaly was significant enough to trigger OPQ Box devices 1006, 1007 and 1002 using the Self-Triggering method.
+In contrast to the Napali method triggered all of the UH devices.
+Figure \ref{expdes:fig:sub:ev1:boxes} is a 1 cycle $V_{rms}$ calculated from the raw data acquired from the OPQ Devices by Napali.
+The threshold displayed as a dashed line clearly outlines the 3 anomalous devices using the Self-Triggered method, however a similar trend is observed in all other devices.
 
-\begin{figure}
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=0.9\linewidth]{img/napali_eval/subthreshold/ev1/ev1_gt.pdf}
     \caption{Utility meter data for Event 1}
     \label{expdes:fig:sub:ev1:gt}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[!ht]
     \centering
     \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev1/boxes_combined.pdf}
-    \caption{Event Data for event 1.}
+    \caption{Napali Event Data for event 1.}
     \label{expdes:fig:sub:ev1:boxes}
 \end{figure}
 
-\begin{figure}
+Another representation of Event 1 is shown in Figure \ref{expdes:fig:sub:ev1:map}.
+Here the severity of the event is categorized not by the value over threshold, but instead by the maximum magnitude of the first derivative of the  $V_{rms}$ waveform.
+Larger changes in the $V_{rms}$ magnitude are used as a metric of the severity of the event at a particular location.
+A larger the magnitude metric corresponds to to a larger circle in Figure \ref{expdes:fig:sub:ev1:map}.
+Furthermore, the the devices which were triggered via the Self-Triggered method in addition to Napali are shown in red.
+Clearly this event looks quite different when acquired via the two considered methodologies.
+From the point of view of the Self-Triggered method, the event only had a limited impact on the power grid with only a small potrion of campus affected.
+On the other hand, Napali provides a much clearer picture of the event propagation and impact.
+It shows the epicenter of the event as well as the sub-threshold portion with a clear boundary of the impacted buildings.
+\begin{figure}[!ht]
     \centering
-    \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev1/map.pdf}
-    \caption{Geospatial representation of event 1.}
+    \includegraphics[width=0.7\linewidth]{img/napali_eval/subthreshold/ev1/map.pdf}
+    \caption{Geospatial representation of event 1.
+    Self-Triggered detected events are shown in red.}
     \label{expdes:fig:sub:ev1:map}
 \end{figure}
+
+\paragraph{Event 2(Nov 29 6:10):}
+This event was observed by only two Utility Smart meters.
+The $V_{rms}$ as converted using Equations \ref{eq:v_rms_3phase_to_signle} and \ref{eq:v_rms_3phaseN_to_signle} Utility meters is shown in Figure \ref{expdes:fig:sub:ev2:gt}.
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.9\linewidth]{img/napali_eval/subthreshold/ev2/ev2_gt.pdf}
+    \caption{Utility meter data for Event 2.}
+    \label{expdes:fig:sub:ev2:gt}
+\end{figure}
+Similarly to event 1, event 2 was categorized by the Utility meters as a voltage swell.
+In continued similarity, same devices: 1006, 1007 and 1002 passed the threshold, and thus were triggered by the Self-Triggering event detection method.
+Napali however, triggered 7 additional devices.
+The cycle level $V_{rms}$ for the devices detected by Napali is shown in Figure \ref{expdes:fig:sub:ev2:boxes}
+While the utility meter data makes Event 1 and Event 2 look quite similar, OPQ data shows them to have an opposing chronological order.
+Instead of a slow $V_{rms}$ rise and a fast return to nominal as observed in event 1, event 2 is characterized by a fast $V_{rms}$ rise and a slow decay.
+Furthermore, the fast $V_{rms}$ rise at $t=130ms$ is further characterised by a transient observed on 4 OPQ Box devices.
+These transients are shown in Figure \ref{expdes:fig:sub:ev2:map}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev2/boxes_combined.pdf}
+    \caption{Napali Event Data for event 2.}
+    \label{expdes:fig:sub:ev2:boxes}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev2/trans_1010.pdf}
+    \end{subfigure}\hspace{5mm}
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev2/trans_1021.pdf}
+    \end{subfigure}
+
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev2/trans_1022.pdf}
+    \end{subfigure}\hspace{5mm}
+    \begin{subfigure}{.45\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev2/trans_1024.pdf}
+    \end{subfigure}
+    \caption{Transients recorded as part of event 2.}
+    \label{expdes:fig:sub:ev2:trans}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/napali_eval/subthreshold/ev2/map.pdf}
+    \caption{Geospatial representation of event 2.
+    Self-Triggered detected events are shown in red.}
+    \label{expdes:fig:sub:ev2:map}
+\end{figure}
+
