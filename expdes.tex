@@ -213,83 +213,7 @@ Five temporal regions during the the 3 Hrs are marked by Napali as potential sub
     \label{fig:expdes:7}
 \end{figure}
 
-\subsection{Sub-Threshold Event Detection}\label{subsec:sub-threshold-event-detection}
-
-One of the main goals of Napali is to utilize metric extraction in order to detect sub-threshold events.
-During the deployment, two types of sub-threshold events have been identified:
-\begin{itemize}
-    \item Partial sub-threshold event.
-    \item Full sub-threshold event.
-\end{itemize}
-Full sub-threshold events consist of one or several devices passing the threshold described in Table \ref{tbl:opq:thresholds},
-as well as one or several devices marked as sub-threshold by Napali.
-Partial sub-threshold events consist of devices which all passed the threshold described in Table \ref{tbl:opq:thresholds}, however some of the devices triggered on a different metric with a much shorter temporal window.
-The important distinction between partial sub-threshold events and regular events is that if triggered using the Self-Triggering method, the majority of the sub-threshold data would be lost.
-
-\begin{figure}[h]
-    \centering
-    \begin{subfigure}{1\textwidth}
-        \centering
-        \includegraphics[width=1\linewidth]{img/napali_eval/rms_gridwide_subthreshold.pdf}
-        \caption{}
-        \label{fig:expdes:8:1}
-    \end{subfigure}%
-
-    \begin{subfigure}{1\textwidth}
-        \centering
-        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_subthreshold_zoom.pdf}
-        \caption{}
-        \label{fig:expdes:8:2}
-    \end{subfigure}
-    \caption{Partial sub-threshold event a) the sub-threshold component of the event, b) above threshold component of the event}
-    \label{fig:expdes:8}
-\end{figure}
-
-An example of a partial sub-threshold event is shown in Figure \ref{fig:expdes:8}.
-Figure \ref{fig:expdes:8:1} shows the sub-threshold component of the event.
-In this event device 2 passed the threshold on $V_{rms}$ metric, initiating Napali to look for sub-threshold events across other devices.
-It is important to note, that at the event start device 1 was considered to be a sub-threshold candidate, however, at $t \approx 26.8s$ device 1 produced a transient metric which was above napali threshold.
-As such Napali requested raw data from both device 1 and device 2, creating a partial sub-threshold event containing both a voltage sag shown in Figure \ref{fig:expdes:8:1} and a transient shown in Figure \ref{fig:expdes:8:2}.
-
-\begin{figure}[h]
-    \centering
-    \begin{subfigure}{0.49\textwidth}
-        \centering
-        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full1.pdf}
-        \caption{}
-        \label{fig:expdes:9:1}
-    \end{subfigure}%
-    \begin{subfigure}{0.49\textwidth}
-        \centering
-        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full2.pdf}
-        \caption{}
-        \label{fig:expdes:9:2}
-    \end{subfigure}
-
-    \begin{subfigure}{0.49\textwidth}
-        \centering
-        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full3.pdf}
-        \caption{}
-        \label{fig:expdes:9:3}
-    \end{subfigure}
-    \begin{subfigure}{0.49\textwidth}
-        \centering
-        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full4.pdf}
-        \caption{}
-        \label{fig:expdes:9:4}
-    \end{subfigure}
-    \caption{Full sub-threshold event across 4 devices.
-    a) Device 1: above threshold b) Device 2: sub-threshold c) Device 3: above threshold d) Device 4: above threshold.}
-    \label{fig:expdes:9}
-\end{figure}
-
-An example of a full sub-threshold event is shown in Figure \ref{fig:expdes:9}.
-This is a short-lived transient event observed by four devices on September 5\textsuperscript{th}.
-Devices 1, 3, and 4 generated a transient metric higher then the Napali threshold.
-Device 2 transient metric did not pass threshold, yet nonetheless produced a severe enough deviation from the mean for Napali to consider it a part of the event.
-This is particularly evident in the mild transient observed in Figure \ref{fig:expdes:9:2}.
-
-\section{University of Hawaii Deployment.}\label{sec:university-of-hawaii-deployment.}
+\subsection{University of Hawaii Deployment.}\label{sec:university-of-hawaii-deployment.}
 
 As part of the Napali validation, the OPQ system was deployed across the University of Hawaii Manoa campus (UH).
 This location was advantageous because it is an isolated microgrid connected to the Oahu powergrid only via a single 46kV feeder as shown in Figure~\ref{expdes:fig:1}.
@@ -998,6 +922,93 @@ The two events that were missed by the Napali framework, only affected a single 
 
 \subsection{Sub-threshold Data Acquisition}\label{subsec:sub-threshold-data-acquisition}
 
+One of the main goals of Napali is to utilize metric extraction in order to detect sub-threshold events.
+During the deployment, two types of sub-threshold events have been identified:
+\begin{itemize}
+    \item Partial sub-threshold event.
+    \item Full sub-threshold event.
+\end{itemize}
+Full sub-threshold events consist of one or several devices passing the threshold described in Table \ref{tbl:opq:thresholds},
+as well as one or several devices marked as sub-threshold by Napali.
+Partial sub-threshold events consist of devices which all passed the threshold described in Table \ref{tbl:opq:thresholds}, however some of the devices triggered on a different metric with a much shorter temporal window.
+The important distinction between partial sub-threshold events and regular events is that if triggered using the Self-Triggering method, the majority of the sub-threshold data would be lost.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{1\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/rms_gridwide_subthreshold.pdf}
+        \caption{}
+        \label{fig:expdes:8:1}
+    \end{subfigure}%
+
+    \begin{subfigure}{1\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_subthreshold_zoom.pdf}
+        \caption{}
+        \label{fig:expdes:8:2}
+    \end{subfigure}
+    \caption{Partial sub-threshold event a) the sub-threshold component of the event, b) above threshold component of the event}
+    \label{fig:expdes:8}
+\end{figure}
+
+An example of a partial sub-threshold event is shown in Figure \ref{fig:expdes:8}.
+Figure \ref{fig:expdes:8:1} shows the sub-threshold component of the event.
+In this event device 2 passed the threshold on $V_{rms}$ metric, initiating Napali to look for sub-threshold events across other devices.
+It is important to note, that at the event start device 1 was considered to be a sub-threshold candidate, however, at $t \approx 26.8s$ device 1 produced a transient metric which was above napali threshold.
+As such Napali requested raw data from both device 1 and device 2, creating a partial sub-threshold event containing both a voltage sag shown in Figure \ref{fig:expdes:8:1} and a transient shown in Figure \ref{fig:expdes:8:2}.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full1.pdf}
+        \caption{}
+        \label{fig:expdes:9:1}
+    \end{subfigure}%
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full2.pdf}
+        \caption{}
+        \label{fig:expdes:9:2}
+    \end{subfigure}
+
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full3.pdf}
+        \caption{}
+        \label{fig:expdes:9:3}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/raw_gridwide_sub_full4.pdf}
+        \caption{}
+        \label{fig:expdes:9:4}
+    \end{subfigure}
+    \caption{Full sub-threshold event across 4 devices.
+    a) Device 1: above threshold b) Device 2: sub-threshold c) Device 3: above threshold d) Device 4: above threshold.}
+    \label{fig:expdes:9}
+\end{figure}
+
+An example of a full sub-threshold event is shown in Figure \ref{fig:expdes:9}.
+This is a short-lived transient event observed by four devices on September 5\textsuperscript{th}.
+Devices 1, 3, and 4 generated a transient metric higher then the Napali threshold.
+Device 2 transient metric did not pass threshold, yet nonetheless produced a severe enough deviation from the mean for Napali to consider it a part of the event.
+This is particularly evident in the mild transient observed in Figure \ref{fig:expdes:9:2}.
+
+While the Naive method compares favorably to Napali when it comes to resource consumption as outlined in Section \ref{subsec:summary-of-computational-and-network-recource-utilisaztion}, it lacks the ability to detect portions of gridwide events which are below the device detection threshold.
+Unlike the Naive method, Napli cooperative edge centric event detection attempts to capture both over-threshold and sub-threshold data as described in Section \ref{subsec:napali-trigger}.
+Section \ref{subsec:temporal-locality-triggering-of-the-napali-framework} described the detection capabilities of the OPQ Network and Napali, when detecting gridwide events with consensus of 2 or more utility meters.
+These are the types of events that the Naive and Napali are equally capable of detecting.
+Indeed, the Naive plugin in Makai received data from devices which were collocated with utility meters which observed the disturbance.
+In contrast Napali  captured additional waveforms which corresponded to the sub-threshold portions of each event.
+More interesting however, were the gridwide events which were extracted from all of the utility meters, not just the ones collocated with an OPQ box.
+Particularly, gridwide events which corresponded to one or more collocated utility meter as well as one or more of the non-collocated meters were of particular interest.
+These events are invariably gridwide, since more then one UH Utility meter was affected, however only a subset of OPQ devices would experince the disturbance with an over-threshold severity.
+These events create a basis for sub-threshold data acquisition false negative analysis.
+After all, it is clearly established that these events are gridwide, and affect only a portion of the UH power delivery infrastructure.
+If Napali is capable of locating and acquiring subthreshold portions of these events, it would prove the claim that the subthreshold event acquisition is both a possible and useful tool for power quality analisys.
+
 \begin{center}
     \begin{table}[!ht]
         \caption{Gridwide events with collocated and non-collocated meters which impacted a portion only a portion of the power grid}
@@ -1025,13 +1036,6 @@ The two events that were missed by the Napali framework, only affected a single 
             1023 \newline
             1024 \\
             \arrayrulecolor{black}\hline
-            Nov 29 16:11 & POST\_MAIN\_2 & BUS\_AD\_SHIDLER\_MAIN\_MTR \newline
-            ST\_JOHN\_PLANT\_SCIENCE\_MAIN\_MTR \newline
-            PHYSICAL\_SCIENCE\_MAIN\_MTR \newline
-            MOORE\_HALL\_MAIN\_MTR \newline
-            HPER\_KLUM\_GYM\_MTR &
-            All\\
-            \arrayrulecolor{black}\hline
             Dec 14 13:14 & POST\_MAIN\_2 & BUS\_AD\_SHIDLER\_MAIN\_MTR \newline
             ST\_JOHN\_PLANT\_SCIENCE\_MAIN\_MTR \newline
             MOORE\_HALL\_MAIN\_MTR \newline &
@@ -1049,60 +1053,28 @@ The two events that were missed by the Napali framework, only affected a single 
     \end{table}
 \end{center}
 
-While the Naive method compares favorably to Napali when it comes to resource consumption as outlined in Section \ref{subsec:summary-of-computational-and-network-recource-utilisaztion}, it lacks the ability to detect portions of gridwide events which are below the device detection threshold.
-Unlike the Naive method, Napli cooperative edge centric event detection attempts to capture both over-threshold and sub-threshold data as described in Section \ref{subsec:napali-trigger}.
-Section \ref{subsec:temporal-locality-triggering-of-the-napali-framework} described the detection capabilities of the OPQ Network and Napali, when detecting gridwide events with consensus of 2 or more utility meters.
-These are the types of events that the Naive and Napali are equally capable of detecting.
-Indeed, the Naive plugin in Makai received data from devices which were collocated with utility meters which observed the disturbance.
-In contrast Napali  captured additional waveforms which corresponded to the sub-threshold portions of each event.
-More interesting however, were the gridwide events which were extracted from all of the utility meters, not just the ones collocated with an OPQ box.
-Particularly, gridwide events which corresponded to one or more collocated utility meter as well as one or more of the non-collocated meters were of particular interest.
-These events are invariably gridwide, since more then one UH Utility meter was affected, however only a subset of OPQ devices would experince the disturbance with an over-threshold severity.
-These events create a basis for sub-threshold data acquisition false negative analysis.
-After all, it is clearly established that these events are gridwide, and affect only a portion of the UH power delivery infrastructure.
-If Napali is capable of locating and acquiring subthreshold portions of these events, it would prove the claim that the subthreshold event acquisition is both a possible and useful tool for power quality analisys.
-
-\subsubsection{False Negative Subthreshold Data Acquisition:}
 Unfortunately, events which impact only a part of the UH power grid with the affected area limited to a region with both collocated and non-collocated meters are quite rare.
-From the data made available to us from the UH Smart meters only 4 such events were identified.
+From the data made available to us from the UH Smart meters only 3 such events were identified.
 These events are shown in Table \ref{tbl:expdes:sub:colononcolo}.
 
-It is unclear why these events all seem to have similar parent utilty meters, however one explanation is this portion of the power grid was not well covered by the opq deployment.
+It is unclear why these events all seem to have similar parent Utility meters, however one explanation is this portion of the power grid was not well covered by the opq deployment.
 Nonetheless, two of the events have data from every device on the OPQ network.
 The other two events only impacted 9 and 10 out of 15 deployed devices respectively.
 Another peculiarity is that POST\_MAIN\_2 and POST\_MAIN\_1 utility meters service the same building, however, POST\_MAIN\_1 was not affected enough to quality for these events.
 In the next section these events are examined in more detail.
-\paragraph{Event 1(Nov 24 7:57 ):}
-The $V_{rms}$ as converted using Equations \ref{eq:v_rms_3phase_to_signle} and \ref{eq:v_rms_3phaseN_to_signle} Utility meters composing this event is shown in Figure \ref{expdes:fig:sub:ev1:gt}.
-This event was characterized as a large voltage swell, affecting a large portion of the campus.
-The voltage anomaly was significant enough to trigger OPQ Box devices 1006, 1007 and 1002 using the Self-Triggering method.
-In contrast to the Napali method triggered all of the UH devices.
-Figure \ref{expdes:fig:sub:ev1:boxes} is a 1 cycle $V_{rms}$ calculated from the raw data acquired from the OPQ Devices by Napali.
-The threshold displayed as a dashed line clearly outlines the 3 anomalous devices using the Self-Triggered method, however a similar trend is observed in all other devices.
-
+\subsubsection{Event 1(Nov 24 7:57 ):}
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=0.9\linewidth]{img/napali_eval/subthreshold/ev1/ev1_gt.pdf}
+    \includegraphics[width=0.7\linewidth]{img/napali_eval/subthreshold/ev1/ev1_gt.pdf}
     \caption{Utility meter data for Event 1}
     \label{expdes:fig:sub:ev1:gt}
 \end{figure}
-
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev1/boxes_combined.pdf}
     \caption{Napali Event Data for event 1.}
     \label{expdes:fig:sub:ev1:boxes}
 \end{figure}
-
-Another representation of Event 1 is shown in Figure \ref{expdes:fig:sub:ev1:map}.
-Here the severity of the event is categorized not by the value over threshold, but instead by the maximum magnitude of the first derivative of the  $V_{rms}$ waveform.
-Larger changes in the $V_{rms}$ magnitude are used as a metric of the severity of the event at a particular location.
-A larger the magnitude metric corresponds to to a larger circle in Figure \ref{expdes:fig:sub:ev1:map}.
-Furthermore, the the devices which were triggered via the Self-Triggered method in addition to Napali are shown in red.
-Clearly this event looks quite different when acquired via the two considered methodologies.
-From the point of view of the Self-Triggered method, the event only had a limited impact on the power grid with only a small potrion of campus affected.
-On the other hand, Napali provides a much clearer picture of the event propagation and impact.
-It shows the epicenter of the event as well as the sub-threshold portion with a clear boundary of the impacted buildings.
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.7\linewidth]{img/napali_eval/subthreshold/ev1/map.pdf}
@@ -1111,31 +1083,37 @@ It shows the epicenter of the event as well as the sub-threshold portion with a 
     \label{expdes:fig:sub:ev1:map}
 \end{figure}
 
-\paragraph{Event 2(Nov 29 6:10):}
-This event was observed by only two Utility Smart meters.
-The $V_{rms}$ as converted using Equations \ref{eq:v_rms_3phase_to_signle} and \ref{eq:v_rms_3phaseN_to_signle} Utility meters is shown in Figure \ref{expdes:fig:sub:ev2:gt}.
+The $V_{rms}$ as converted using Equations \ref{eq:v_rms_3phase_to_signle} and \ref{eq:v_rms_3phaseN_to_signle} Utility meters composing this event is shown in Figure \ref{expdes:fig:sub:ev1:gt}.
+This event was characterized as a large voltage swell, affecting a large portion of the campus.
+The voltage anomaly was significant enough to trigger OPQ Box devices 1006, 1007 and 1002 using the Self-Triggering method.
+In contrast to the Napali method triggered all of the UH devices.
+Figure \ref{expdes:fig:sub:ev1:boxes} is a 1 cycle $V_{rms}$ calculated from the raw data acquired from the OPQ Devices by Napali.
+The threshold displayed as a dashed line clearly outlines the 3 anomalous devices using the Self-Triggered method, however a similar trend is observed in all other devices.
+
+Another representation of Event 1 is shown in Figure \ref{expdes:fig:sub:ev1:map}.
+Here the severity of the event is categorized not by the value over threshold, but instead by the swing between the maximum and minimum of the $V_{rms}$ waveform.
+Larger changes in the $V_{rms}$ magnitude are used as a metric of the severity of the event at a particular location.
+A larger the magnitude metric corresponds to to a larger circle in Figure \ref{expdes:fig:sub:ev1:map}.
+Furthermore, the the devices which were triggered via the Self-Triggered method in addition to Napali are shown in red.
+Clearly this event looks quite different when acquired via the two considered methodologies.
+From the point of view of the Self-Triggered method, the event only had a limited impact on the power grid with only a small potrion of campus affected.
+On the other hand, Napali provides a much clearer picture of the event propagation and impact.
+It shows the epicenter of the event as well as the sub-threshold portion with a clear boundary of the impacted buildings.
+
+\subsubsection{Event 2(Nov 29 6:10):}
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=0.9\linewidth]{img/napali_eval/subthreshold/ev2/ev2_gt.pdf}
+    \includegraphics[width=0.7\linewidth]{img/napali_eval/subthreshold/ev2/ev2_gt.pdf}
     \caption{Utility meter data for Event 2.}
     \label{expdes:fig:sub:ev2:gt}
 \end{figure}
-Similarly to event 1, event 2 was categorized by the Utility meters as a voltage swell.
-In continued similarity, same devices: 1006, 1007 and 1002 passed the threshold, and thus were triggered by the Self-Triggering event detection method.
-Napali however, triggered 7 additional devices.
-The cycle level $V_{rms}$ for the devices detected by Napali is shown in Figure \ref{expdes:fig:sub:ev2:boxes}
-While the utility meter data makes Event 1 and Event 2 look quite similar, OPQ data shows them to have an opposing chronological order.
-Instead of a slow $V_{rms}$ rise and a fast return to nominal as observed in event 1, event 2 is characterized by a fast $V_{rms}$ rise and a slow decay.
-Furthermore, the fast $V_{rms}$ rise at $t=130ms$ is further characterised by a transient observed on 4 OPQ Box devices.
-These transients are shown in Figure \ref{expdes:fig:sub:ev2:map}
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev2/boxes_combined.pdf}
     \caption{Napali Event Data for event 2.}
     \label{expdes:fig:sub:ev2:boxes}
 \end{figure}
-
-\begin{figure}[h]
+\begin{figure}[!ht]
     \centering
     \begin{subfigure}{.45\textwidth}
         \centering
@@ -1145,7 +1123,6 @@ These transients are shown in Figure \ref{expdes:fig:sub:ev2:map}
         \centering
         \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev2/trans_1021.pdf}
     \end{subfigure}
-
     \begin{subfigure}{.45\textwidth}
         \centering
         \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev2/trans_1022.pdf}
@@ -1157,12 +1134,82 @@ These transients are shown in Figure \ref{expdes:fig:sub:ev2:map}
     \caption{Transients recorded as part of event 2.}
     \label{expdes:fig:sub:ev2:trans}
 \end{figure}
-
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.7\linewidth]{img/napali_eval/subthreshold/ev2/map.pdf}
     \caption{Geospatial representation of event 2.
-    Self-Triggered detected events are shown in red.}
+    Self-Triggered detected events are shown in red.
+    Waveforms containing transients are shown in green.}
     \label{expdes:fig:sub:ev2:map}
 \end{figure}
 
+This event was observed by only two Utility Smart meters.
+The $V_{rms}$ as converted using Equations \ref{eq:v_rms_3phase_to_signle} and \ref{eq:v_rms_3phaseN_to_signle} Utility meters is shown in Figure \ref{expdes:fig:sub:ev2:gt}.
+Similarly to event 1, event 2 was categorized by the Utility meters as a voltage swell.
+In continued similarity, same devices: 1006, 1007 and 1002 passed the threshold, and thus were triggered by the Self-Triggering event detection method.
+Napali however, triggered 7 additional devices.
+The cycle level $V_{rms}$ for the devices detected by Napali is shown in Figure \ref{expdes:fig:sub:ev2:boxes}
+While the utility meter data makes Event 1 and Event 2 look quite similar, OPQ data shows them to have an opposing chronological order.
+Instead of a slow $V_{rms}$ rise and a fast return to nominal as observed in event 1, event 2 is characterized by a fast $V_{rms}$ rise and a slow decay.
+
+Further analysis indicates that the fast $V_{rms}$ rise at $t=130ms$ is further characterised by a transient observed by 4 OPQ Box devices.
+These transients are shown in Figure \ref{expdes:fig:sub:ev2:map}
+The transients were small enough to be missed by the Self-Triggered event detection method, yet were captured by Napali.
+The geospatial representation of event 2 is shown in Figure \ref{expdes:fig:sub:ev2:map}.
+As with event 1, the magnitude of the event is taken as the swing between the minimum and maximum of the $V_{rms}$ waveform.
+Event magnitude is represented as the size of the symbol on Figure \ref{expdes:fig:sub:ev2:map}.
+Red represents devices triggered by both Napali and the Self-Triggered method.
+Blue are events which were triggered only by Napali.
+Finally, green color symbols represent events which were triggered by Napali with contained transients.
+
+Event 2 as observed by the Self-Triggered method contains only a small portion of the event.
+The same building as event 1 were observed as affected, with no information available regarding the rest of the grid.
+The transients are completely missed, and so is the rest of the affected locations.
+This event looks significantly different when observed via Napali.
+The University power gid is divided into three distinct portions.
+West portion of campus experienced a $V_{rms}$ swell which surpassed the OPQ imposed threshold.
+South portion experienced a $V_{rms}$ swell of a similar magnitude, without passing the threshold.
+Finally, the North-East portion of the campus experienced a similar disturbance as the southern section with an addition of a transient.
+
+\subsubsection{Event 3(Dec 14 13:14):}
+
+Event 3 is very similar to event 1.
+It was characterized by a slow $V_{rms}$ swell followed by a sharp return to nominal.
+Utility meter data for the triggered Utility meters is shown in Figure \ref{expdes:fig:sub:ev3:gt}.
+No additional transient was observed as with event 1.
+Devices 1006, 1007 and 1002 were triggered via the Self-Triggered method, while Napali acquired data from every device on the network.
+Cycle level $V_{rms}$ of the recorded data is shown in Figure \ref{expdes:fig:sub:ev3:boxes}.
+Finally, the geogrpahical representation of this event is shown in Figure \ref{expdes:fig:sub:ev3:map}.
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/napali_eval/subthreshold/ev3/ev3_gt.pdf}
+    \caption{Utility meter data for Event 3.}
+    \label{expdes:fig:sub:ev3:gt}
+\end{figure}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/ev3/boxes_combined.pdf}
+    \caption{Napali Event Data for event 3.}
+    \label{expdes:fig:sub:ev3:boxes}
+\end{figure}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/napali_eval/subthreshold/ev3/map.pdf}
+    \caption{Geospatial representation of event 3.
+    Self-Triggered detected events are shown in red.
+    Waveforms containing transients are shown in green.}
+    \label{expdes:fig:sub:ev3:map}
+\end{figure}
+
+\subsubsection{False Negative Sub-Threshold Data Acquisition:}
+
+As mentioned previously, the goal of Napali is not a low false positive detection rate.
+Napali only serves as a gateway for data acquisition in a complex system designed for power quality analysis.
+Any false positive events acquired by Napali will be cross examined by algorithms far better suited for waveform analysis.
+Instead, the goal of Napali is to provide an extremely low false negative event detection rate, providing the downstream detection stack all of the available data from all potentially affected device.
+As shown in the evaluation with the ground truth data napali has performed significantly better then the Self-Triggerd method in event acquisition.
+False negative sub-threshold data acquisition rate on Napali is approximately 0\% based on the following facts:
+\begin{enumerate}
+    \item \textbf{Multiple triggered collocated meters:} as shown in Section \ref{subsec:temporal-locality-triggering-of-the-napali-framework} Napali was able to identify events which were marked as gridwide by the utility meters at the rate of 100\% accuracy.
+    \item \textbf{Single triggered collocated meters:} Napali was able to capture the both threshold and subthreshold data for events which were identified as gridwide by a subset of collocated and non-collocated Utility meters at a rate of 100\% accuracy.
+\end{enumerate}
