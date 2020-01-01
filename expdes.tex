@@ -1179,7 +1179,7 @@ Utility meter data for the triggered Utility meters is shown in Figure \ref{expd
 No additional transient was observed as with event 1.
 Devices 1006, 1007 and 1002 were triggered via the Self-Triggered method, while Napali acquired data from every device on the network.
 Cycle level $V_{rms}$ of the recorded data is shown in Figure \ref{expdes:fig:sub:ev3:boxes}.
-Finally, the geogrpahical representation of this event is shown in Figure \ref{expdes:fig:sub:ev3:map}.
+Finally, the geographical representation of this event is shown in Figure \ref{expdes:fig:sub:ev3:map}.
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.7\linewidth]{img/napali_eval/subthreshold/ev3/ev3_gt.pdf}
@@ -1201,15 +1201,177 @@ Finally, the geogrpahical representation of this event is shown in Figure \ref{e
     \label{expdes:fig:sub:ev3:map}
 \end{figure}
 
-\subsubsection{False Negative Sub-Threshold Data Acquisition:}
+\subsubsection{False Negative Sub-Threshold Data Acquisition.}
 
 As mentioned previously, the goal of Napali is not a low false positive detection rate.
 Napali only serves as a gateway for data acquisition in a complex system designed for power quality analysis.
 Any false positive events acquired by Napali will be cross examined by algorithms far better suited for waveform analysis.
 Instead, the goal of Napali is to provide an extremely low false negative event detection rate, providing the downstream detection stack all of the available data from all potentially affected device.
-As shown in the evaluation with the ground truth data napali has performed significantly better then the Self-Triggerd method in event acquisition.
+As shown in the evaluation with the ground truth data napali has performed significantly better then the Self-Triggered method in event acquisition.
 False negative sub-threshold data acquisition rate on Napali is approximately 0\% based on the following facts:
 \begin{enumerate}
     \item \textbf{Multiple triggered collocated meters:} as shown in Section \ref{subsec:temporal-locality-triggering-of-the-napali-framework} Napali was able to identify events which were marked as gridwide by the utility meters at the rate of 100\% accuracy.
     \item \textbf{Single triggered collocated meters:} Napali was able to capture the both threshold and subthreshold data for events which were identified as gridwide by a subset of collocated and non-collocated Utility meters at a rate of 100\% accuracy.
 \end{enumerate}
+
+\subsubsection{University Power Grid Partitioning via Power Quality Data}
+
+In addition to the 3 events described in the previous section Napali detected another 25 events with the devices 1006, 1007 and 1002 being the only ones that passed the predefined thresholds, all with a large sub-threshold data pool.
+All 28 of these events share the same structure with a voltage swell, some with additional transients in the rest of the power grid.
+Besides devices 1006, 1007 and 1002 further clusters of of events were identified.
+There were 28 events with devices 1024 and 1000 observing a temporally correlated voltage sag.
+A typical of such event in temporal and spacial representation is shown in Figure \ref{fig:expdes:sub:ev4}.
+
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/clustering/366584.pdf}
+    \end{subfigure}%
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/clustering/366584_data.pdf}
+    \end{subfigure}
+    \caption{
+    A voltage sag observed on Dec 4, 6:07.
+    \textit{Right:} Temporal representation
+    \textit{Left:} Spacial representation.
+    }
+    \label{fig:expdes:sub:ev4}
+\end{figure}
+
+There were 15 events with devices 1003 and 1001 observing a common voltage sag beyond the threshold.
+A typical event involving these devices is shown in Figure \ref{fig:expdes:sub:ev5}.
+
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/clustering/315639.pdf}
+    \end{subfigure}%
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/clustering/315639_data.pdf}
+    \end{subfigure}
+    \caption{
+    A voltage sag observed on Nov 21, 6:24.
+    \textit{Right:} Temporal representation
+    \textit{Left:} Spacial representation.
+    }
+    \label{fig:expdes:sub:ev5}
+\end{figure}.
+
+While the origin of these events is unclear, Napali data allows for creation of a propagation model for events originating from the triggered subset of the clustered devices to the rest of the network.
+For this model the $max(V_{rms}) - min(V_{rms})$ is used as the anomaly metric.
+We can compute the average fraction of the anomaly metric for any devices $d$ to device $p$ over $n$ events as shown in Equation \ref{eq:expdes:weight}
+\begin{equation} \label{eq:expdes:weight}
+\begin{aligned}
+    W_{p \rightarrow d} = \frac{1}{n}\sum_{n}\frac{(max(V_{rms}) - min(V_{rms}))_{p}}{((max(V_{rms}) - min(V_{rms}))_{d}}
+\end{aligned}
+\end{equation}
+
+The result of Equation \ref{eq:expdes:weight} for the cluster of events triggered by 1000 and 1024 is shown in Figure \ref{fig:expdes:sub:fracto1000}.
+\begin{figure}[ht!]
+    \centering
+        \includegraphics[width=0.8\linewidth]{img/napali_eval/subthreshold/clustering/1024toall.pdf}
+    \caption{$W_{p \rightarrow d}$ metric computed for device p=1024}
+    \label{fig:expdes:sub:fracto1024}
+\end{figure}
+
+The error bars in Figure \ref{fig:expdes:sub:fracto1024} represent the $\sigma$ of the fraction between device 1024 and device in question across the 28 events in the cluster dataset.
+It is clear that the disturbances observed by OPQ Boxes 1010, 1005, 1021, 1022, 1023, 1002, 1007 and 1006 show are strongly interconnected with those observed by devices 1024 and 1000.
+On the other hand devices 1008, 1009, 1025, 1001 and 1003 experience a much more diminished disturbance.
+
+A similar examination was performed on cluster of events triggered by a $V_{rms}$ swell observed by devices 1002, 1006 and 1007.
+This time device 1006 was selected as the device $p$.
+Result of Equation \ref{eq:expdes:weight} with error bars representing  $\sigma$ of the fractions between device 1006 and device in question is shown in Figure \ref{fig:expdes:sub:fracto1006}.
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/napali_eval/subthreshold/clustering/1006toall.pdf}
+    \caption{$W_{p \rightarrow d}$ metric computed for device p=1006}
+    \label{fig:expdes:sub:fracto1006}
+\end{figure}
+
+Figure \ref{fig:expdes:sub:fracto1006} and \ref{fig:expdes:sub:fracto1024} both show the same trend.
+Devices 1010, 1005, 1021, 1022, 1023, 1002, 1007, 1006, 1024 and 1000 observe similar magnitude $V_{rms}$ swell while devices 1008, 1009, 1025, 1001 and 1003 are minimally affected.
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/napali_eval/subthreshold/clustering/1003toall.pdf}
+    \caption{$W_{p \rightarrow d}$ metric computed for device p=1003}
+    \label{fig:expdes:sub:fracto1003}
+\end{figure}
+
+Finally, we examined cluster of events triggered by devices 1003 and 1001 using Equation \ref{eq:expdes:weight} with OPQ Box 1003 serving as device $p$.
+As previously, the error bars represent standard deviation of the fractions between device 1006 and device in question.
+The result of this analysis is shown in Figure \ref{fig:expdes:sub:fracto1003}.
+These $W_{p \rightarrow d}$ results shown here are the opposite of the results for the other two clusters.
+Devices 1008, 1009, 1025, 1001 and 1003 experience similar magnitude of the disturbance while for devices 1010, 1005, 1021, 1022, 1023, 1002, 1007, 1006, 1024 and 1000 are far less impacted.
+
+From these observations, we can conclude that at the top level, the Uhiversiy of Hawaii power grid is divided into two subgrids
+The East subgrid is monitored by OPQ Boxes 1010, 1005, 1021, 1022, 1023, 1002, 1007, 1006, 1024 and 1000.
+The West subgrid is monitored by OPQ Boxes 1008, 1009, 1025, 1001 and 1003.
+Each of the subgrids is further divided into portions as is illustrated by an event shown in Figure \ref{fig:expdes:sub:ev6}
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/clustering/411686.pdf}
+    \end{subfigure}%
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/clustering/411686_data.pdf}
+    \end{subfigure}
+    \caption{
+    A voltage sag observed on Dec 16 14:43.
+    \textit{Right:} Temporal representation.
+    \textit{Left:} Difference between the minimum and maximum $V_{rms}$.
+    }
+    \label{fig:expdes:sub:ev6}
+\end{figure}
+
+Figure \ref{fig:expdes:sub:ev6} shows an event that was captured by Napali on Dec 16.
+Recording of this event was initiated by devices 1008 and 1009 $V_{rms}$ measurement passing the voltage sag threshold, with additional sub-threshold data captured from the rest of the network.
+Figure \ref{fig:expdes:sub:ev6} shows the further division of the West subgrid in what is potentially subgrids containing devices 1008 and 1009 as well as devices 1003, 1025 and 1001.
+
+This level of analysis would be impossible with a self-triggered dataset.
+Without subthreshold data the top level clustering would consist of 4 individual clusters instead of just 2.
+It should be noted that during this analysis we found it impossible to reconstruct lower sub-grid  hierarchy from events that affected the entire higher level.
+For example consider the two most severe events that OPQ Observed during the UH deployment as shown in Figure \ref{fig:expdes:sub:ev7}.
+With all of the devices passing the voltage sag $V_{rms}$ threshold, previous sub-grid structure is nor readily apparent.
+
+The simple explanation is that the propagation of the Power Quality events from the top of the hierarchy down operates differently from the events discussed previously.
+If an event occurs in a subgrid it must propagate up the power delivery infrastructure to affect a neighbouring subgrid.
+On the other hand, events that affect the entire network never perform lateral jumps in the hierarchy.
+As the distributed power generation overtakes the large centralized power plants, this type of grid partitioning and monitoring will become increasingly more important.
+Instead of monitoring a single power producing entity such as a coal or natural gas plant, many distributed renewable and non-renewable power sources will need to be monitored for their power quality contribution.
+Self-Triggering systems are incapable of performing this task, while Naive methods do not scale well enough to support potentially thousands of monitoring sites.
+Napali on the other hand, has proven to operate efficiently, resiliently and accurately in the power quality domain.
+
+\begin{figure}[ht!]
+    \centering
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/clustering/318273.pdf}
+    \end{subfigure}%
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/clustering/318273_data.pdf}
+    \end{subfigure}
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/clustering/323282.pdf}
+    \end{subfigure}%
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{img/napali_eval/subthreshold/clustering/323282_data.pdf}
+    \end{subfigure}
+    \caption{
+    Two of the largest magnitude events recorded by the OPQ network.
+    \textit{Right:} Temporal representation.
+    \textit{Left:} Difference between the minimum and maximum $V_{rms}$.
+    }
+    \label{fig:expdes:sub:ev7}
+\end{figure}
+

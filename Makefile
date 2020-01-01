@@ -1,6 +1,6 @@
 all:
 	mkdir -p build
-	rm -f build/*
+	rm -fr build/*
 	cd build; texi2pdf ../dissertation.tex --output dissertation-snegrashov.pdf
 	cd ..
 	evince build/dissertation-snegrashov.pdf &
