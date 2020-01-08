@@ -123,21 +123,23 @@ The advantages of the Napali methodology compared to the naive and self triggere
     With the advent of IOT, the computational capacity of the edge devices is increasing.
     Napali exploits these resources, and thus minimizes the sink computational requirements.
 
-    \item \textbf{Sub-threshold data acquisition:} The triggering stream sink makes the decision to acquire raw waveform from sensor nodes.
+    \item \textbf{Sub-threshold data acquisition is a cost-effective way to improve understanding of grid-local anomalies:}
+    The triggering stream sink makes the decision to acquire raw waveform from sensor nodes.
     This allows researchers to collect data from devices which were only mildly affected or not affected by the disturbance.
     This provides new possibilities for investigation of disturbance propagation across the sensed area.
+    Furthermore, subthreshold data acquisition from node leaves allows for monitoring of the internal system state.
 
-    \item \textbf{Power failure resiliency:} In the case of the complete power failure or communication blackout, if the monitoring device has a battery backup capability, each sensor has a record of the entire raw waveform leading up to the power interruption.
+    \item \textbf{Increased resiliency with respect to power failure:} In the case of the complete power failure or communication blackout, if the monitoring device has a battery backup capability, each sensor has a record of the entire raw waveform leading up to the power interruption.
     Prior to shutdown the sensor node will transfer all of the raw data from the volatile memory to on-board permanent storage.
     Once the power or communication channel is restored, select portions of the buffer may be sent back to the data sink.
     This creates an additional layer of resiliency for the anomaly detection network.
 
-    \item \textbf{Flexible Privacy:} Anomalies which were only observed at a single point are most likely local noise and pose little value for global state monitoring.
+    \item \textbf{Increased flexibility with respect to privacy protection policies:} Anomalies which were only observed at a single point are most likely local noise and pose little value for global state monitoring.
     It's up to the user to decide how to process disturbances which affect their sensor.
     For example user may choose to record a full waveform, only certain features, or record nothing at all.
     Secondly, if the saturation of the device is high enough only a subset of them would need to send a triggering stream for event detection, while the rest will be used for acquiring raw waveform for small temporal regions containing global events.
 
-    \item \textbf{Temporal Locality:} By exploiting the temporal locality it is possible to ascertain the geographical extent of the anomaly with only coarse features.
+    \item \textbf{Temporal locality allows Napali to provide improved insights into power quality anomalies over traditional triggering algorithms:} By exploiting the temporal locality it is possible to ascertain the geographical extent of the anomaly with only coarse features.
     This allows for a simple robust algorithm which may be deployed at the sink node for anomaly detection.
 \end{enumerate}
 
@@ -254,8 +256,10 @@ This implies that combination of temporal and threshold based correlation on the
 Today's big data world is plagued with the issues of data cleaning and validation, even though it's being relied on for timely, accurate and actionable intelligence.
 With large ingress of unstructured data these issues are unavoidable, and preprocessing will remain a large portion of the analysis workload.
 However, in the case of sensor networks designed for a specific purpose, the tasks of anomaly detection can be pushed to the edge of the network using the Napali methodology.
-The claim of this thesis is that Napali provides novel architecture that is both a feasible solution to the problem of distributed power quality monitoring and significant benefits over the two standard alternative architectures (all computation/storage at nodes, all computation/storage at the sink).
 
+\begin{tcolorbox}
+\textbf{The claim of this thesis is that Napali provides novel architecture that is both a feasible solution to the problem of distributed power quality monitoring and significant benefits over the two standard alternative architectures (all computation/storage at nodes, all computation/storage at the sink)}.
+\end{tcolorbox}
 To evaluate the merit of the Napali framework, I implemented it as part of the Open Power Quality(OPQ) system and apply it to the problems of power quality monitoring.
 Combined with higher level anomaly analysis, Napali provides important services for a Open Power Quality power quality monitoring network.
 This network is made up of a group of monitoring devices as well as a centralized data sink server.
@@ -285,40 +289,46 @@ Thus, monitoring of the leaf edges of the power delivery system can in principle
 The Open Power Quality system is designed to be a test bed for development of new power quality detection and analysis algorithms.
 Its introduction will facilitate development of new techniques and methods for studying power system, by utilizing the Napali framework as the main anomaly detection methodology.
 To evaluate the benefits of this architecture, I assessed the data collected by the OPQ network at the University of Hawaii in order to determine if the claimed benefits of the architecture are observed in practice.
-The description of the evaluation processes for the benefits described in Section \ref{intro:section:napali} are summarized below.
+The description of the evaluation processes for the benefits described in Section \ref{intro:section:napali} are summarized in the following sections.
 
-\begin{enumerate}
-    \item \textbf{Bandwidth usage is minimized:} Bandwidth consumption of the OPQ system was be carefully monitored, recorded and compared to the bandwidth required to transmit the equivalent amount of raw data.
-    A more detailed description of this evaluation can be found in Section \ref{iexp:sec:band}.
 
-    \item \textbf{Effects of latency are minimized:}  Latency limits of the triggering system were examined.
-    Since these limits are heavily dependent on the raw data storage ability of the OPQ Box, latency effects were tested under various amount of memory allocated for this task.
-    A more detailed description of this evaluation can be found in Section \ref{iexp:sec:lat}.
+\subsection{Napali minimizes bandwidth usage}\label{subsec:napali-minimizes-bandwidth-useage}
+Bandwidth consumption of the OPQ system was be carefully monitored, recorded and compared to the bandwidth required to transmit the equivalent amount of raw data.
+Furthermore, a Self-Triggered data acquisition will be running along side the Napali event detector.
+Thus, all three described methods will be compared in bandwidth performance.
+A more detailed description of this evaluation can be found in Section \ref{subsec:napali-bandwidth-usage}.
 
-    \item \textbf{Temporal locality:} Data acquired from the UH building level meters was compared with the data acquired via the Napali triggering framework.
-    This allowed me to establish the rate of false positives and negatives and evaluate the temporal locality triggering algorithm.
-    Furthermore, the single location events, which are normally rejected by Napali were also be examined and compared to the data provided by the building power meters.
-    A more detailed description of this evaluation can be found in Section \ref{iexp:sec:loc}.
+\subsection{Napali mitigates device latency effects}\label{subsec:effects-of-latency-are-minimized:}
+Latency limits of the triggering system were examined.
+Latency effects on the Naive and Napali event detection methodologies were be considered.
+Since these limits are heavily dependent on the raw data storage ability of the OPQ Box, latency effects were tested under various amount of memory allocated for this task.
+A more detailed description of this evaluation can be found in Section \ref{subsec:effects-of-latency-in-the-napali-framework}.
 
-    \item \textbf{Sink processing requirements are minimized:} Synthetic benchmarks were carried out on the sink node to determine the scalability of the triggering system.
-    These scalability metrics were compared with a synthetic benchmark of running multiple copies of the OPQ Box analysis software on the same node.
-    This allowed me to compare the scalability of the sink node in the case of sending the entirety of raw data stream versus the Napali frameworks approach of only sending extracted metrics.
-    A more detailed description of this evaluation can be found in Section \ref{iexp:sec:scale}.
+\subsection{Napali minimizes sink processing requirements}\label{subsec:napali-minimizes-sink-processing-requirements}
+Synthetic benchmarks were carried out on the sink node to determine the scalability of the triggering system.
+These scalability metrics were compared with a synthetic benchmark of running multiple copies of the OPQ Box analysis software on the same node.
+This allowed me to compare the scalability of the sink node in the case of sending the entirety of raw data stream versus the Napali frameworks approach of only sending extracted metrics.
+A more detailed description of this evaluation can be found in Section \ref{subsec:sink-processing-requirement-under-the-napali-framework}.
 
-    \item \textbf{Sub-threshold data acquisition:} Evaluation of the sub-threshold data acquisition was accomplished in two steps.
-    First, the triggering stream from the OPQ Boxes was stored along with the acquired raw data.
-    The triggering stream was used to compute which fraction of devices would have self triggered if operating autonomously.
-    Next the building level meters self triggering capabilities, were compared to the Napali sub-threshold triggering.
-    This provided a baseline comparison of Napali with a commercially deployed system.
-    A more detailed description of this evaluation can be found in Section \ref{iexp:sec:sub}.
+\subsection{Napali temporal locality triggering results in a low false negative detection}\label{subsec:temporal-locality-capabilities:}
+Data acquired from the UH building level meters was compared with the data acquired via the Napali triggering framework.
+This allowed me to establish the rate of false negatives and evaluate the temporal locality triggering algorithm.
+A more detailed description of this evaluation can be found in Section \ref{subsec:temporal-locality-triggering-of-the-napali-framework}.
 
-\end{enumerate}
+
+\subsection{Sub-threshold data acquisition is a viable event detection strategy}\label{subsec:sub-threshold-data-acquisition:}
+In this claim I examined a subset of events that will only be detected via the subtheshold triggering.
+This was performed by analysing UH meter data, searching for events that Napali could only detect via subthreshold detection.
+This provided a baseline comparison of Napali with a commercially deployed system.
+A more detailed description of this evaluation can be found in Section \ref{subsec:sub-threshold-data-acquisition}.
+
+\subsection{Napali failure resiliency and flexible privacy}\label{subsec:napali-failure-resiliency-and-flexible-privacy}
 Although power failure resiliency and flexible privacy are claimed benefits of the Napali architecture, they were not evaluated as part of this thesis research.
 Flexible privacy required a much larger deployment, and a user study, which was beyond the scope of this project.
 Furthermore the power failure resilience of the Napali framework would require a significant development effort in development of the battery management system.
 Since complete power failures are quite rare, there is no guarantee that a single power outage would occur on the UH campus during the deployment.
 
-
+\subsection{Napali in other domains}\label{subsec:napali-in-other-domains}
 The last claim of this dissertation is that the Napali architecture can be applied to other domains.
 Once the Napali framework was fully characterized, and its strengths and weaknesses were well understood, I performed an in-depth literature review of other domains which could benefit from Napali-like approach to event detection.
 I further characterized the kinds of design changes to existing sensors that the Napali Framework required in order to apply it to these domains.

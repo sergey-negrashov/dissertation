@@ -1,0 +1,79 @@
+\section{Application of Napali in Other domains}\label{sec:application-of-napali-in-other-domains}
+Sensor networks are prolific in today's world.
+Industrial process and environment monitoring is striving to make the world more efficient and productive.
+Medical and Personal sensing is a welcome addition to in improving health care and quality of life.
+Many of these fields operate in regimes suitable for Napali.
+To reiterate Napali is well suited for sensor networks operating in domains with:
+\begin{itemize}
+    \item Signal to noise ratio of $>1$.
+    \item Consensus based event detection.
+    \item Two way communication between the device and sink is possible.
+\end{itemize}
+Any monitoring situation which requires a consensus of multiple devices, with individual devices unable to ascertain the validity of an anomaly is well suited for Napali deployment.
+In this section we review potential applications of Napali to several domains intrinsically different from power quality monitoring, while still following the above requirements.
+
+\subsection{Earthquake detection}
+Detection of seismic phenomenon is a tak well suited for sensor networks.
+Single location monitoring is unfeasible, due to multitude of factors.
+The local noise from human activity results in a large number of false positives.
+Furthermore, single location monitoring is useless for development of an early warning system.
+Earthquake detection relies on prompt detection of P-waves, or pressure waves.
+These waves travel faster then their more destructive counterpart: S-waves.
+A prompt detection and characterisation of a P-wave can provide an early warning of an impending catastrophe.
+A large number of sensor networks of varying complexity and sophistication have been deployed in order to monitor their ares of effect for seismic activity.\cite{burkett2014shakealert}\cite{zaicenco2012lessons}\cite{klapez2018first}\cite{finazzi2017statistical}
+
+In their paper "Lessons Learned from Operating an On-site Earthquake Early Warning System"\cite{zaicenco2012lessons} authors Zaicenco and Weir-Jones describe main challenges for designing and operating an earthquake detection system:
+\begin{enumerate}
+    \item Unknown direction of a potential seismic event, since sources that are capable of generating
+    the ground motion that exceeds design parameters are spread around the region.
+    \item Multiple sources of industrial noise at the site: highway traffic, railroad, fishery, heavy trucks
+    driving several meters away from the instrumented area;
+    \item Requirement for the system to operate 24/7 in the autonomous mode for several years;
+    \item High cost of a potential false alarm, which might result in closing the traffic on the major
+    highway.
+\end{enumerate}
+
+Their experience comes from operation of borehole sensor arrays located along the highways of British Columbia.
+Each sensor array is connected via a fiber drop to the central computer.
+Every measurement performed by the sensor array is transmitted to main processing unit for P-wave analysis.
+The triggering algorithm first precomputes a p-wave metric for each sensor, and uses a threshold based algorithm from earthquake detection.
+This is a well established system which was able to detect and provide early warning for multiple earthquakes during its operational phase 2009-2011.
+The design of this system is very similar to a Naive triggering method for Power Quality monitoring.
+All data is funneled to the central sink and processed on site.
+
+California Integrated Seismic Network is another seismograph sensor network consisting of over 400 high quality borehole sensors.\cite{uhrhammer2011california}
+Similarly to the On-site Earthquake Early Warning System, California Integrated Seismic Network transmits all of the sensor data to the central sink.
+California Integrated Seismic Network is now a part of ShakeAlert, a US based effort to integrate seismic prediction into actionable intelligence.
+
+Another approach to earthquake monitoring comes from the newly emerged IOT domain.
+Cellphone based Earthquake Network \cite{finazzi2017statistical} utilizes smartphone accelerometers in order to detect P-wave propagation throughout the world.
+As a part of the Earthquake Network, cellphones which are at rest and plugged into a power source will monitor the internal accelerometer for abnormalities.
+If the inertial tensor recorded by the cellphone passes a threshold a message will be transmitted to a central cloudbased sink.
+The cloudbased sink in turn uses device location and statistical clustering in order to determine if a P-wave has been detected.
+Another IOT sensor network designed for earthquake detection is called Earthcloud.\cite{klapez2018first}
+This sensor network utilises dedicated low cost sensors which communicate via the Internet to the centralized sink.
+Similarly to the Earthquake Network, Earthcloud utilizes the number of "prewarnings"(devices which passed the local threhold) in order to determine if an earthquake is taking place.
+
+Sensor networks described above fall into the two categories described in the previous chapters.
+The On-site Earthquake Early Warning System and California Integrated Seismic Network are the Naive approaches with all of the sensor data funneled to the sink.
+Earthcloud and Earthquake Network on the other hand are similar to the self-triggered system, with additional statistical analysis performed at the sink.
+All three networks maintain two way TCP/IP link between devices and the sink.
+With a relatively number of nodes On-site Earthquake Early Warning System and California Integrated Seismic Network are able to operate in the Naive mode due to relatively low bandwidth requirements.
+On the other hand, Earthquake Network app has 4 million downloads and 75000 active cellphones, and as such is forced to operate in the self triggered mode.
+
+Napali methodology could further enchance both of these event detection topologies.
+"High quality" earthquake monitoring networks such as California Integrated Seismic Network serve a dual purpose.
+First and foremost, they are the nations early warning system for disaster mitigation.
+Secondly they are a research and analysis tool used by geophysicist to study earthquake propagation, localisation and clasification.
+Application of Napali to earthquake detection could:
+\begin{enumerate}
+    \item Reduce the bandwidth requirement for operating a seismic sensor.
+    \item Preserve subthrehold earthquake data for earthquake analysis.
+    \item Reject single point anomalies resulting from human activity.
+\end{enumerate}
+Napali approach would aggregate multiple measurements, in order to conserve bandwidth for below threshold events.
+If a local threshold is passed the measurement would be forwarded to the sink immediately in order to provide a timely latency.
+If the sink determines that a P-wave has been detected, raw, high resolution data can be requested from the seismic sensor.
+
+Currently IOT approaches are useless for scientific application, since only a "prewarning" is transmitted to the sink without the high resolution waveform.
+With Napali useful high resolution data can be transmitted for later scientific analysis.
