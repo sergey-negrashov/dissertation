@@ -369,6 +369,13 @@ Devices 1, 3, and 4 generated a transient metric higher then the Napali threshol
 Device 2 transient metric did not pass threshold, yet nonetheless produced a severe enough deviation from the mean for Napali to consider it a part of the event.
 This is particularly evident in the mild transient observed in Figure \ref{fig:expdes:9:2}.
 
+\subsection{Event Dataset}\label{subsec:event-dataset}
+Event dataset used in this analysis consists of data from 15 devices collected between November 14th and January 1st 2019.
+There are 2163 events in total, with 1378 $V_{rms}$ events and  737 transient events.
+6 Events were related solely to frequency and 83 related solely to total harmonic disturbance.
+During the deployment, OPQ network achieved 97\% availability with only downtime relating to software updates and a power outage November 25h power outage.
+
+
 \clearpage
 
 \section{Napali Validation}\label{sec:napali-validation}
@@ -465,7 +472,7 @@ Each of the three methods, Napali, Self-Triggered, and Naive, has different sink
 
 First, let's consider the Naive method.
 In this case all of the metrics need to be extracted at the sink.
-Disregarding the processing power required to keep up with the data rate described in Section \ref{iexp:sec:band} the $C_{feature\_extraction}$ can be measured empirically.
+Disregarding the processing power required to keep up with the data rate described in Section \ref{subsec:napali-bandwidth-usage} the $C_{feature\_extraction}$ can be measured empirically.
 In order perform this measurement, OPQ Box software was built for an x86 architecture and stress-tested.
 Instead of acquiring data from a device driver, the feature extraction stack was supplied with synthetic data.
 Finally, the ZMQ communication was removed and replaced with the performance analysis code.
@@ -682,8 +689,7 @@ As mentioned previously, during the University of Hawaii deployment the OPQ netw
 Data from these devices provided ground truth when it came to evaluating OPQ power quality anomaly detection.
 Before we delve deeper into that, will compare the OPQ Box and utility meter metric extraction capabilities.
 
-\subsubsection{Utility meter metric extraction comparison}
-
+\subsubsection{Utility meter metric extraction comparison} \label{subsubsec:utility-box-comp}
 8 OPQ devices were collocated along with smart utility meters capable of logging power quality metrics.
 This analysis focuses on Device 1000 along with a smart utility meter labeled POST\_MAIN\_2 which is located upstream of Device 1000.
 POST\_MAIN\_2 is monitoring a 480V line going into the Pacific Ocean and Science Building prior to it's conditioning and stepped down into the domestic 120V.
