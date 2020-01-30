@@ -6,24 +6,24 @@
   \label{fig:opq:1}
 \end{figure}
 
-Open Power Quality (OPQ) power quality monitoring network utilizes residential power quality meters, called OPQ Boxes, in order to detect anomalies in the electricity distribution across the Oahu power grid.
+The Open Power Quality (OPQ) power quality monitoring network utilizes residential power quality meters, called OPQ Boxes, in order to detect anomalies in the electricity distribution across the Oahu power grid.
 In addition to OPQ Boxes, the OPQ project utilizes cloud-based aggregation services for power quality event detection, classification and display.
 The block diagram of the OPQ network is shown in Figure~\ref{fig:opq:1} .
 
 The major components of OPQ are:
 \begin {itemize}
-	\item OPQ Box: an in-house designed, open source power quality meter that conforms to Napali Framework requirements for the "source".
-	\item Makai: data aggregation and event detection service that conforms to the Napali Framework requirements for the "sink"
-	\item Mauka: event analysis and classification service.
+	\item OPQ Box: An open source power quality meter which conforms to Napali Framework requirements for the "source".
+	\item Makai: data aggregation and event detection service that I designed and that runs as part of the sensor network "sink".
+	\item Mauka: event analysis and classification service designed by my colleague Anthony Christe.
 \end {itemize}
 
 The following sections describe the OPQ network components, services and protocols.
 
 \section{OPQ Box}\label{sec:opq-box}
 
-OPQ Box is an in-house designed power quality meter which focuses on providing the means for cheap, extensible and accurate residential power quality measurements.
+OPQ Box is a power quality meter I designed for the OPQ project, which focuses on providing the means for cheap, extensible and accurate residential power quality measurements.
 The block diagram of the current revision of OPQ Box, OPQ Box2 is shown in the Figure~\ref{fig:opq:1:1}.
-A complete device in an acrylic enclosure is shown in Figure~\ref{fig:opq:1:2}.
+A complete device is shown in Figure~\ref{fig:opq:1:2}.
 
 \begin{figure}[h]
 	\centering
@@ -365,7 +365,7 @@ The structure of triggering messages is shown in Table \ref{tbl:opq:trg_struct}.
 
 \subsection{Acquisition Broker}\label{subsec:acquisition-broker}
 
-The Acquisiton Broker manages the two way communication between the OPQ Boxes and the rest of the cloud infrastructure.
+The Acquisiton Broker manages the two-way communication between the OPQ Boxes and the rest of the cloud infrastructure.
 Unlike the triggering stream which originates from the OPQ Box, two way communication is always initiated by the cloud services.
 Two way communication is realized via a command response interface, where the OPQ service initiates the communication by sending a clear text command to the Acquisition Broker, which then forwards it in the encrypted form to the appropriate OPQ Boxes.
 
@@ -725,7 +725,7 @@ This way every future data message which contains that $EVENT\_TOKEN$, it will b
 ER diagram of the MongoDB event storage is shown in Figure \ref{fig:opq:mongo_er}.
 The Events collection contains metadata for individual events.
 Box\_events collection contains metadata for event information from individual OPQ devices.
-Finally gridfs, MongoDB internal file storage, is used for storing event data.
+Finally gridfs, MongoDB's internal file storage, is used for storing event data.
 
 \begin{figure}[h]
 	\begin{center}
@@ -758,7 +758,7 @@ Debug plugin consists of a Lisp interpreter which can manipulate the triggering 
 It can be used to quickly and interactively test new analysis methods, and debug the OPQ network.
 
 \subsubsection{Threshold Trigger}
-Threshold trigger plugin is used for in situ comparison of a naive triggering method to Napali.
+Threshold trigger plugin is used for in-situ comparison of a naive triggering method to Napali.
 Every time the Threshold plugin receives a triggering message, it will check it against global thresholds.
 If a metric value is outside of the predetermined thresholds the Triggering plugin will latch the timestamp and the id of the affected device.
 Once the metric returns to normal, Threshold plugin will emit a request for raw data to the device which is experiencing an event.
@@ -783,8 +783,7 @@ Threshold values for each metric are shown in Table \ref{tbl:opq:thresholds}
 	\end{table}
 \end{center}
 
-
-Threshold Trigger plugin functions in the same way as a self-triggering device.
+The Threshold Trigger plugin functions in the same way as a self-triggering device.
 Since this method of event detection does not rely on intra-box information sharing, it functions in the same manner as if the OPQ Box itself
 is performing event detection.
 This allows for experimental comparison of the Napali method efficiency with the self-triggered methodology.
