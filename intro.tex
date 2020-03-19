@@ -14,7 +14,7 @@ I evaluated Napali in part by implementing it in the power quality monitoring do
 \section{Overview of power grids}\label{sec:overview-of-power-grids}
 Modern power grids are hierarchically structured.
 Higher voltage is useful for transporting electricity over long distances, connecting cities and towns to power generation facilities.
-Transmissions lines of 100kV and above are used to minimize losses in long distance runs, since the same amount of power can be transmitted using much lower current, and thus much more efficiently, then the comparable low voltage line.
+Transmissions lines of 100kV and above are used to minimize losses in long distance runs, since the same amount of power can be transmitted using much lower current, and thus much more efficiently, than the comparable low voltage line.
 Close to the point of distribution, transmission voltage is stepped down to 1kV-40kV range using large power transformers.
 This is done because the losses incurred in the final leg of transmission are minimal, while extremely high voltage equipment is expensive and requires special precautions.\cite{sivanagaraju2008electric} Finally, at the consumer level the voltage level is stepped down once more to the household voltage, for example $120V_{ac}$ for North America.
 It is important to note that voltage across every part of the power grid is synchronized to a phase and frequency set by the utility.
@@ -222,7 +222,7 @@ Several thousand devices could easily saturate at 1Gb link with no obvious benef
 Collecting and recording all of the raw waveform data from residential power quality meters for batch processing presents some privacy concerns as outlined above.
 On the other hand, an on board event detection methodology, allows the measurement devices to select which temporal regions of measurements constitute an event.
 This is a perfect strategy from the consumer's perspective, since it would allow for recording of power quality information which directly impact their residence.
-As mentioned in Section \ref{intro:edge}, this method relies on a threshold based approach where every device has a computes several metrics from the raw waveform and compares then to preprogrammed threshold values.
+As mentioned in Section \ref{intro:edge}, this method relies on a threshold based approach where every device has a computes several metrics from the raw waveform and compares than to preprogrammed threshold values.
 Metrics such as $V_{rms}$, fundamental frequency and THD are easily adapted for single point power quality measurements.
 Temporal regions during which these metrics surpass a threshold are considered by the device as a power quality event, and thus are recorded.
 
@@ -307,7 +307,7 @@ To reiterate: the central claim of this thesis is that Napali provides a feasibl
 I will provide evidence for this central claim by evaluating the following subclaims about Napali:
 
 \subsection{Napali minimizes bandwidth usage}\label{subsec:napali-minimizes-bandwidth-useage}
-Bandwidth consumption of the OPQ system was be carefully monitored, recorded and compared to the bandwidth required to transmit the equivalent amount of raw data.
+Bandwidth consumption of the OPQ system was carefully monitored, recorded and compared to the bandwidth required to transmit the equivalent amount of raw data.
 Furthermore, a Self-Triggered data acquisition ran along side the Napali event detector.
 Thus, all three methods were compared in bandwidth utilization.
 A more detailed description of this evaluation is found in Section \ref{subsec:napali-bandwidth-usage}.

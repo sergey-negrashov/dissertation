@@ -22,7 +22,7 @@ The following sections describe the OPQ network components, services and protoco
 \section{OPQ Box}\label{sec:opq-box}
 
 OPQ Box is a power quality meter I designed for the OPQ project, which focuses on providing the means for cheap, extensible and accurate residential power quality measurements.
-The block diagram of the current revision of OPQ Box, OPQ Box2 is shown in the Figure~\ref{fig:opq:1:1}.
+The block diagram of the current revision of OPQ Box, OPQ Box2 is shown in Figure~\ref{fig:opq:1:1}.
 A complete device is shown in Figure~\ref{fig:opq:1:2}.
 
 \begin{figure}[h]
@@ -51,11 +51,10 @@ An isolated AC-DC converter generates $5V_{dc}$ from the mains $120V_{ac}$.
 5V is used to power the Raspberry Pi, equipment connected to the expansion port, 3.3V regulators and voltage reference and an isolated DC/DC converter.
 3.3V is used to power the isolated end of the isolation amplifier as well as the STM32F3 analog to digital converter/digital signal processor (ADC/DSP).
 The hot side of the isolation amplifier is powered from the isolated DC/DC converter.
-This allows OPQ Box to function with the battery attached to the expansion port, so that it may retain data and continue to operate during a power outage.
-
+This allows OPQ Box to function with a battery attached to the expansion port, so that it may retain data and continue to operate during a power outage.
 
 The analog signal path of the OPQ Box2 is complicated by the fact that the STM32F3 ADC/DSP is electrically isolated from the mains power.
-A previous iteration of the OPQ Box, OPQ Box1, overcame this by employing small circuit board mount isolation transformer.
+A previous iteration of the OPQ Box, OPQ Box1, overcame this by employing a small circuit board mount isolation transformer.
 Unfortunately it was found that the frequency response of these transformers varied wildly between individuals, thus incurring a lengthy calibration process for each device.
 Design on the OPQ Box2 solved this issue by using an AMC1100 isolation amplifier as the isolation component.
 Internally AMC1100 consists of a single die comprised of a $\Sigma\Delta$ analog to digital and digital to analog converters.
@@ -63,9 +62,9 @@ These converters are separated by a silicon glass region on the integrated circu
 Since the signal passes the isolation boundary as a $\Sigma\Delta$ encoded digital signal, it incurs no distortion and no additional calibration is required.
 In order to match the dynamic range of the AMC1100 the $120V_{ac}$ is passed through the resistor divider to attenuate it to $120mV_{ac}$.
 The input and output of the isolation amplifier is filtered with a passive first order anti-aliasing filter.
-Isolated signal is then digitized via a 16bit ADC of the STM32F3 DSP at $12 KSps$, which gives 200 data samples per grid cycle.
-Internally digitization process runs asynchronously with the respect to the the DSP CPU, in order to minimize timing jitter.
-It was verified that the sampling jitter of the ADC is less then 1us, however due to limited precision of equipment an exact figure was not established.
+The isolated signal is then digitized via a 16bit ADC of the STM32F3 DSP at $12 KSps$, which gives 200 data samples per grid cycle.
+Internally the digitization process runs asynchronously with respect to the DSP CPU, in order to minimize timing jitter.
+It was verified that the sampling jitter of the ADC is less than 1us, however due to limited precision of equipment an exact figure was not established.
 Data stream in its digital form is transferred to the Raspberry Pi single board computer (SBC) for analysis.
 
 \begin{figure}[h]
@@ -86,13 +85,13 @@ A hardware interrupt line is used to inform Pi software that the DSP is ready fo
 During the initial design of the OPQ Box 2 software, SPI data transfer was attempted in userland.
 However due to the lack of support for DMA in the SPI kernel-to-userland bridge, a large portion of the CPU time was spent facilitating data transfer, resulting in degraded analysis performance as well as missed data samples.
 Current revision of the OPQ Box 2 software stack utilizes a kernel driver for management of SPI bus.
-Internally OPQ driver maintains a ring buffer of 16 windows each 200 data samples in size.
-Upon the receiving the interrupt for the DSP, the CPU sets up the DMA transfer and the DMA engine transfers a 200 sample window into the kernel memory without CPU interaction.
-This scheme requires the CPU to only service 60 interrupts a second, with each interrupt requiring on the order of 100 instructions, yielding the CPU utilization of less then $1\%$ in normal operation.
-Userland applications communicate with the kernel driver using a file descriptor, where every $write$ system call yields 200 samples of raw waveform.
+Internally the OPQ driver maintains a ring buffer of 16 windows each 200 data samples in size.
+Upon receiving the interrupt for the DSP, the CPU sets up the DMA transfer and the DMA engine transfers a 200 sample window into the kernel memory without CPU interaction.
+This scheme requires the CPU to only service 60 interrupts a second, with each interrupt requiring on the order of 100 instructions, for a CPU utilization of less than $1\%$ in normal operation.
+Userland applications communicate with the kernel driver using a file descriptor, where every $read$ system call yields 200 samples of raw waveform.
 Thus the smallest window that a userland application may process is a single AC cycle of the grid mains.
 
-Userland component of the OPQ Box 2 software is a multi-threaded extensible analysis framework called Triggering.
+The userland component of the OPQ Box 2 software is a multi-threaded extensible analysis framework called Triggering.
 The reader thread is responsible for transferring and accumulating data from the kernel driver.
 The smallest data buffer that the Triggering application processes at any given time is 10 grid cycles or 2k samples.
 Once the cycles are transferred to the userland and timestamped, they are passed to the analysis thread for feature extraction, as well as to the Raw Data Ring Buffer (RDRB).
@@ -116,30 +115,34 @@ Since a sinusoid has two zero crossings for a full cycle the frequency can be ca
  f = \frac{1}{\frac{2}{n}\sum\limits_{k=0}^{k=n}{\Delta t_{k}}}
 \end{equation}
 
-\begin{figure}[h]
+\begin{figure}[ht!]
 	\centering
-	\begin{subfigure}{.5\textwidth}
+	\begin{subfigure}{.8\textwidth}
 	  \centering
-	  \includegraphics[width=0.9\linewidth]{img/filter1_gain.png}
+	  \includegraphics[width=1\linewidth]{img/filter1_gain.png}
 	  \caption{}
 	  \label{fig:opq:4:1}
 	\end{subfigure}%
-	\begin{subfigure}{.5\textwidth}
+
+	\begin{subfigure}{.8\textwidth}
 	  \centering
-	  \includegraphics[width=0.9\linewidth]{img/filter1_response.png}
+	  \includegraphics[width=1\linewidth]{img/filter1_response.png}
 	  \caption{}
 	  \label{fig:opq:4:2}
 	\end{subfigure}
-
-	\begin{subfigure}{.5\textwidth}
+\end{figure}
+\begin{figure}[ht!]\ContinuedFloat
+	\centering
+	\begin{subfigure}{.75\textwidth}
 	  \centering
-	  \includegraphics[width=0.9\linewidth]{img/filter2_gain.png}
+	  \includegraphics[width=1\linewidth]{img/filter2_gain.png}
 	  \caption{}
 	  \label{fig:opq:4:3}
 	\end{subfigure}%
-	\begin{subfigure}{.5\textwidth}
+
+	\begin{subfigure}{.75\textwidth}
 	  \centering
-	  \includegraphics[width=0.9\linewidth]{img/filter2_response.png}
+	  \includegraphics[width=1\linewidth]{img/filter2_response.png}
 	  \caption{}
 	  \label{fig:opq:4:4}
 	\end{subfigure}
@@ -175,13 +178,13 @@ For the sinusoidal signal $V_{rms}$ can be calculated from the peak to peak valu
 \begin{equation} \label{eq:2}
 	V_{rms} = \frac{V_{pp}}{2\sqrt{2}}
 \end{equation}
-It is common for multimeter to employ the equation above for computing $V_{rms}$.
+It is common for multimeters to employ the equation above for computing $V_{rms}$.
 However this equation is only valid for a perfect sinusoid, and thus does not result in a suitable metric for identifying power quality disturbances.
 Instead OPQ Box 2 computes $V_{rms}$ as follows:
 \begin{equation} \label{eq:3}
 	V_{rms} = \sqrt{\frac{1}{n}\sum\limits_{k=0}^{k=n}V_{k}^{2}}
 \end{equation}
-Similarly to the frequency calculation OPQ Box 2 usees a 10 cycle window for a single $V_{rms}$ calculation, however unlike the frequency calculation the input is not filtered a priori.
+Similarly to the frequency calculation OPQ Box 2 uses a 10 cycle window for a single $V_{rms}$ calculation, however unlike the frequency calculation the input is not filtered a priori.
 An example of a power quality disturbance which exhibits low $V_{rms}$ is shown in Figure~\ref{fig:opq:6:1} and~\ref{fig:opq:6:2}.
 These disturbances are the result of a lighting strike recorded by two OPQ Box 2 devices on Nov 1, 2017.
 
@@ -199,7 +202,7 @@ These disturbances are the result of a lighting strike recorded by two OPQ Box 2
 	  \caption{}
 	  \label{fig:opq:6:2}
 	\end{subfigure}
-	\caption{A lightning strike recorded by two OPQ Box 2 devices separated by 10 miles. (a) A lightning strike manifested as $V_{rms}$ dip which lasted 11 cycles. (b) As a consequence of using NTP these devices have $\frac{1}{2}$ cycle mismatch in reported timestamps.}
+	\caption{A lightning strike recorded by two OPQ Box 2 devices separated by 10 miles. (a) A lightning strike manifested as a $V_{rms}$ dip which lasted 11 cycles. (b) As a consequence of using NTP these devices have a $\frac{1}{2}$ cycle mismatch in reported timestamps.}
 	\label{fig:opq:6}
 \end{figure}
 
@@ -213,7 +216,7 @@ THD = \frac{\sqrt{\sum{V_{n}^2}}}{V_{f}}*100\%
 Where $V_{f}$ is the fundamental 60Hz power and $V_{n}$ is the power at $n^{th}$ harmonic.
 It should be noted that in the power quality domain THD is expressed as a percentage as opposed to $\frac{dB}{\sqrt{Hz}}$ as used in other disciplines.
 Operationally, OPQ Box computes THD for 10 cycles of the fundamental frequency.
-First an FFT transforms the real voltage samples into it's frequency components.
+First an FFT transforms the real voltage samples into its frequency components.
 Next, the square of the harmonic bins is accumulated and scaled by the magnitude of the fundamental power.
 
 \begin{figure}[h]
@@ -225,7 +228,7 @@ Next, the square of the harmonic bins is accumulated and scaled by the magnitude
 
 Figure~\ref{fig:opq:7} shows a common trend observed by all OPQ Box devices installed on the UH campus.
 For clarity only two devices are shown.
-It is assumed that the large drop observed daily from approximately 6am to 6pm corresponds to the automatic response of the power delivery system to the reactive power in the grid, by deploying a large capacitor bank to compensate for the current phase lag.
+It is assumed that the large drop observed daily from approximately 6pm to 6am corresponds to the automatic response of the power delivery system to the reactive power in the grid, by deploying a large capacitor bank to compensate for the current phase lag.
 
 \subsection{Transient Detection}\label{subsec:transient-detection}
 
@@ -287,10 +290,10 @@ A small transient of approximately 1.6V was observed occurring at 2600s, while t
 
 Computed fundamental frequency and $V_{rms}$ are transmitted to the Makai service for aggregation.
 Data transmission is handled using ZeroMq software stack with Curve25519 elliptic curve encryption.
-Each device holds a unique private and public key, as well as the servers public key, allowing both the Makai service and the OPQ Box 2 to verify it's peer.
+Each device holds a unique private and public key, as well as the servers' public key, allowing both the Makai service and the OPQ Box 2 to verify its peer.
 Internally metrics transmission uses ZeroMq's PUB/SUB protocol.
 This protocol is a publish subscribe topology, with each message containing the topic, and a payload.
-Additionally ZeroMq pub-sub topology allows for multiple sub peers with subscriptions forwarder to the publisher automatically via a side channel.
+Additionally ZeroMq pub-sub topology allows for multiple sub peers with subscriptions forwarded to the publisher automatically via a side channel.
 This allows for the aggregation service to be spread across multiple nodes, with minimal network overhead.
 
 If the aggregation service determines that an anomaly has occurred, it is able to request raw waveform from the OPQ Box 2 RDRB via a separate ZeroMq pub sub channel.
@@ -301,7 +304,7 @@ Protobuf message serialization is used to encode messages across the OPQ ecosyst
 In order to make a distributed measurement, all of the OPQ Boxes on the OPQ network need to maintain an accurate time reference.
 Time synchronization across multiple OPQ Boxes is accomplished using the Network Time Protocol.
 The expansion port of the OPQ Box 2 supports a GPS receiver.
-GPS receivers require line of sight to the sky, and since the with out on-board real-time clock, every power interruption requires a GPS cold start.
+However, since GPS receivers require line of sight to the sky it was not used for deployment.
 NTP performance has been verified against GPS resulting in time error of $8ms\pm 5ms$ which is typical for NTP running over the Internet with a close by NTP server.
 This error is visualized in a Figure~\ref{fig:opq:6:2}.
 With a large coincidental $V_{pp}$ drop across two devices, a 7ms phase error is clearly visible.
@@ -396,7 +399,7 @@ All commands between services downstream of the Acquisition Broker and OPQ Boxes
 			\textbf{command} & \textit{Command} & Command payload.\\
 			& &\\
 			\arrayrulecolor{green}\hline
-			\textbf{\textcolor{myGreen}{OPB Box $\rightarrow$ Makai}} & &\\
+			\textbf{\textcolor{myGreen}{OPQ Box $\rightarrow$ Makai}} & &\\
 			\hline
 			\textbf{Field} & \textbf{Type} & \textbf{Description} \\
 			\arrayrulecolor{black}\hline
@@ -414,7 +417,7 @@ All commands between services downstream of the Acquisition Broker and OPQ Boxes
 In order to send a message to an OPQ Box, a client generates a \textbf{Makai $\rightarrow$ OPQ Box} command containing its identity, serializes it, and forwards it to the Acquisition broker's push port.
 The acquisition broker assigns a unique sequence number to the request and stores it in an internal synchronized key value store along with the sender identity.
 The message is re-serialized and sent out to the desired OPQ Box via the broker's encrypted pub interface.
-Each message sent to the OPQ Box generates a response in form of \textbf{OPB Box $\rightarrow$ Makai} message.
+Each message sent to the OPQ Box generates a response in form of \textbf{OPQ Box $\rightarrow$ Makai} message.
 This response is received by the Acquisition broker via encrypted pull interface, deserialized and validated.
 Response sequence number is used to determine the recipient's identity, and the message is forwarded to the correct recipient via the broker's cleartext publish interface.
 It is important to note that the service which generates a command and the service which receives the response need not be the same, and a command originator may place the box response into the subscribe stream of a different service.
@@ -425,7 +428,7 @@ These sequence numbers and identities are logged, since a lack of a response ind
 
 There are four unique payload commands/responses which an OPQ Box understands.
 These payloads are ignored by the Acquisition Broker and are simply forwarded to the recipient.
-Bellow is the list of commands/responses:
+Below is the list of commands/responses:
 \begin{itemize}
 	\item{\textbf{(HEALTH) Health:}} The health command is broadcast periodically across all of the OPQ Boxes, in order to collect diagnostics from all OPQ devices.
 	The OPQ Box response to this command contains diagnostic information, such as the timestamp of the last event requested, ip address and the name and strength of the WIFI network the OPQ Box is connected to.
@@ -462,7 +465,7 @@ Utilities which query all available devices, such as a periodic health check ser
 			\hline
 			\textbf{Field} & \textbf{Type} & \textbf{Description} \\
 			\arrayrulecolor{black}\hline
-			\textbf{measurement\_rate}  & \textit{uint32} & Number of cycles per triggering triggering message.\\
+			\textbf{measurement\_rate}  & \textit{uint32} & Number of cycles per triggering message.\\
 			& &\\
 			\arrayrulecolor{green}\hline
 			\textbf{\textcolor{myGreen}{RD}} & &\\
@@ -582,7 +585,7 @@ A block diagram of the Acquisition Service is shown in Figure \ref{fig:opq:makai
 
 The Acquisition Service accesses the triggering stream by connecting to the publish socket of the Triggering broker.
 Since the connection is managed through the ZeroMq publish-subscribe socket, several Acquisition Services can be connected to a single Triggering broker endpoint each servicing a subset of OPQ Boxes by subscribing to only specific devices.
-This functionality is used to manage devices that the OPQ project sends to the mainland for evaluation by organisations interested in the project.
+This functionality is used to manage devices that the OPQ project sends for evaluation by organisations interested in the project.
 These loner devices participate in their own triggering schemes, and do not contaminate the triggering stream with messages about an unconnected grid.
 
 Triggering messages received by the Acquisition service are buffered and stored in the MongoDB database.
@@ -691,7 +694,7 @@ If a plugins is not able to keep up with the triggering stream, The Acquisition 
 and a message indicating this fault will be stored in its log.
 Once a plugin is loaded it will receive its settings in the form of a JSON encoded string using the $on\_plugin\_load$ method.
 This allows it to initialize all of the internal data structures to a known state.
-Similarly $on\_plugin\_unload$ method is used to inform the plugin that it will be immanently unloaded.
+Similarly $on\_plugin\_unload$ method is used to inform the plugin that it is about to be unloaded.
 
 The processing of the triggering stream occurs in the $process\_measurement$ method.
 This methods takes a reference counted Measurement message in form shown in Table \ref{tbl:opq:trg_struct}.
@@ -706,10 +709,10 @@ Event requester will fill in the identity field with the following string:
 The ``$data\_$" prefix is used to route the messages responses from the OPQ Box to the Event storage service.
 As mentioned previously, responses from device command need not return to the same service that sent the command.
 Instead, the responses will be routed to a service which is subscribed to the identity used in the request.
-The $EVENT\_TOKEN$ root is a 16 character random hexadecimal string, which identifies data request corresponding to the same event event.
-Since a single event may contain data from multiple OPQ Boxes, and each event will have a unique $EVENT\_TOKEN$ root.
+The $EVENT\_TOKEN$ root is a 16 character random hexadecimal string, which identifies data request corresponding to the same event.
+Since a single event may contain data from multiple OPQ Boxes, and each event waveform will share a unique $EVENT\_TOKEN$ root.
 The $ACQ\_UUID$ postfix is used to identify the Acquisition service which triggered the data request.
-Multiple Acquisition Services can be used to service the OPQ network, and each one is identified using it's own UUID identifier.
+Multiple Acquisition Services can be used to service the OPQ network, and each one is identified using its own UUID identifier.
 This identifier may be assigned to each service via the configuration file, or autogenerated at startup.
 Once the identity of each command is filled in, each command is forwarded to the Acquisition broker for routing to the OPQ Box experiencing a power quality disturbance.
 
@@ -721,7 +724,7 @@ and subscribes to all messages that start with the prefix ``$data\_$".
 This allows the Event service to capture every response from OPQ Boxes generated from commands issued by the Acquisition service plugins.
 Once the Event service receives a data response with an identity containing an $EVENT\_TOKEN$ it hasn't seen before it will increment the event number, and
 store it in an internal key value store.
-This way every future data message which contains that $EVENT\_TOKEN$, it will be appended to the same event.
+This way every future data message which contains that $EVENT\_TOKEN$, will be appended to the same event.
 ER diagram of the MongoDB event storage is shown in Figure \ref{fig:opq:mongo_er}.
 The Events collection contains metadata for individual events.
 Box\_events collection contains metadata for event information from individual OPQ devices.
@@ -762,7 +765,7 @@ Threshold trigger plugin is used for in-situ comparison of a naive triggering me
 Every time the Threshold plugin receives a triggering message, it will check it against global thresholds.
 If a metric value is outside of the predetermined thresholds the Triggering plugin will latch the timestamp and the id of the affected device.
 Once the metric returns to normal, Threshold plugin will emit a request for raw data to the device which is experiencing an event.
-If an event is longer then 50\% of the RDRB of an OPQ Box buffer an event will be broken up into several shorter events.
+If an event is longer than 50\% of the RDRB of an OPQ Box buffer an event will be broken up into several shorter events.
 Threshold values for each metric are shown in Table \ref{tbl:opq:thresholds}
 
 \begin{center}
@@ -797,15 +800,15 @@ Similarly, once the offending metric from all devices return to normal, Napali p
 The main difference between the Napali trigger and the Threshold trigger are two-fold:
 \begin{enumerate}
 	\item An event is not considered finished until every device's metrics return to the nominal threshold range.
-	\item Metric value is within the nominal threshold but outside 3 standard deviations of a mean, will cause a the device to be participating in the  event.
+	\item Metric value which does not surpass the threshold but is placed $3\sigma$ of the mean, will mark the device as an event participant.
 \end{enumerate}
 
 The first difference allows Napali to track a propagation of a fault throughout the power delivery network.
 Furthermore, during a lifetime of a power quality event, it may shift from one metric to another.
-As the disturbance travels, through the power-grid, Napali will aggregate all of the temporally localized disturbances into one event.
+As the disturbance travels through the power-grid, Napali will aggregate all of the temporally localized disturbances into one event.
 The second disturbance allows for recording of sub-threshold data to be acquired from devices which did not pass the threshold, but exhibited anomalous behaviour.
 
-The mean and standard deviation are calculated using two first order IIR filter loops as show in Equation \ref{eq:iir_mean}:
+The mean and standard deviation are calculated using two first order IIR filter loops as shown in Equation \ref{eq:iir_mean}:
 \begin{equation}\label{eq:iir_mean}
 \begin{aligned}
 	\mu_{n+1} = (1- \alpha)*\mu_{n} + \alpha * m \\
@@ -824,13 +827,13 @@ The $\alpha$ parameter determines the memory of the filter, and can be computed 
 \end{equation}
 Where $T_{sample}$ is the sampling rate of the system, 1s for OPQ, and $T_{memory}$ is the desired response of the system.
 
-Using an IIR filter for mean and standard deviation calculation is computationally cheaper then using a FIR window.
+Using an IIR filter for mean and standard deviation calculation is computationally cheaper than using a FIR window.
 Furthermore, using the IIR filter makes it trivial to tune the response of the system during runtime.
 
 \section{OPQ Mauka}\label{sec:opq-mauka}
-OPQ Mauka service is responsible for higher level classification and filtering of the anomalies generated by the OPQ Makai.\cite{laha}
-Since anomalies generation only relies on the triggering stream features and not raw data, OPQ Makai is not able to ascertain if the anomaly is an actual power quality event, event type, or its severity.
-OPQ Mauka on the other hand operates on the raw data, thus it is able to perform high level analysis to meet industry standards for vent classification.
+The OPQ Mauka service is responsible for higher level classification and filtering of the anomalies generated by the OPQ Makai.\cite{laha}
+Since anomalies generation only relies on the triggering stream features and not raw data, the OPQ Makai is not able to ascertain if the anomaly is an actual power quality event, event type, or its severity.
+The OPQ Mauka on the other hand operates on the raw data, thus it is able to perform high level analysis to meet industry standards for vent classification.
 The block diagram of the OPQ Mauka is shown in~\ref{fig:opq:11}.
 \begin{figure}[h]
   \begin{center}

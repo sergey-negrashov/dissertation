@@ -1,5 +1,5 @@
 \section{Edge computing}\label{sec:lit:edge-computing}
-Projections performed by Forbes suggest that by 2025, more then 75 billion Internet of Things(IOT) devices will be connected to the Internet.\cite{forbesiot}
+Projections performed by Forbes suggest that by 2025, more than 75 billion Internet of Things(IOT) devices will be connected to the Internet.\cite{forbesiot}
 As the devices at the edge become more computationally capable and more numerous, it becomes imperative to share the computational load not only across the cloud services, but across the devices themselves.
 Furthermore, a large portion of these devices, such as home automation, do not require a connection to the cloud in the first place.
 Instead they require a connection to the edge IOT hub, or need the cloud service only to establish or broker communication with another IOT device.
@@ -34,18 +34,18 @@ Furthermore, the CDN methodology, still relies on a central mediator for device 
     \centering
     \includegraphics[width=0.6\linewidth]{img/cdn.png}
     \caption{Content delivery network architecture.
-    As described in the Google pattent.\cite{gagliardi2011content}}
+    As described in the Google patent.\cite{gagliardi2011content}}
     \label{lit:fig:2}
 \end{figure}
 
 In an attempt to support a more diverse IOT ecosystem, current research is focused on moving the cloud service ever closer to the edge of the network.
-Since the majority of IOT devices are located withing one hop of the Internet, the next logical place to locate a content provider is at the wireless basestation.\cite{satyanarayanan2017emergence} These servers, commonly referred to as cloudlets or fog servers, are collocated with various wireless basestations, which allows them to provide a location specific service to the user without using the Internet.
+Since the majority of IOT devices are located within one hop of the Internet, the next logical place to locate a content provider is at the wireless basestation.\cite{satyanarayanan2017emergence} These servers, commonly referred to as cloudlets or fog servers, are collocated with various wireless basestations, which allows them to provide a location specific service to the user without using the Internet.
 This approach also provides uniform access and simplifies intercommunication between a variety of devices, including those that don't use TCP/IP. Unlike the localized cloud cache approach relied on by the CDNs, fog servers are built with the notion of moving not only data but also the application logic to the edge of the network.
 To facilitate inter-device communication between the devices using differing wireless protocols, fog servers can no longer rely on TCP/IP routing.
 Instead, TCP/IP becomes yet another transfer protocol along with Bluetooth, Zigbee, 3g etc, with routing between the devices implemented as a software service.\cite{edgeiot} A few use-cases of such technology are already found in industry.
 Examples of these include airline/bus in-flight entertainment, and shopping mall directory apps.
 A block diagram of this infrastructure is shown in figure \ref{lit:fig:3}.
-In the future, emerging technologies which are sensitive to latency, such as virtual and augmented reality will benefit from fog computing, since it's inherently lower latency then the cloud counterparts.
+In the future, emerging technologies which are sensitive to latency, such as virtual and augmented reality will benefit from fog computing, since it's inherently lower latency than the cloud counterparts.
 
 \begin{figure}[h]
     \centering
@@ -56,14 +56,14 @@ In the future, emerging technologies which are sensitive to latency, such as vir
 \end{figure}
 
 With the architecture for low latency communication between the edge devices and the fog provider established, the state of the art in edge computing research is focused on intelligent sharing of the computational resources in the fog system.
-Edge servers generally have far more computational capacity then the edge device, however, they service many such devices.
+Edge servers generally have far more computational capacity than the edge device, however, they service many such devices.
 Additionally, due to the fickle nature of radio links connecting the edge device to the fog service, the work sharing protocol must be able to cope with link and packet loss.
 Finally, in the case of battery powered devices, the energy cost of transmitting the computational job, and receiving its result may exceed the cost of performing the computation locally.
 Finally, with mobile edge nodes, such as smart phones, and smart cars, computational offloading algorithms must be able to handle constant network reconfigurations as the edge nodes enter and leave the fog server geographical area.
 A number of algorithms have been proposed for efficient and robust computational sharing in fog environments. \cite{oueis2015fog} \cite{wang2015mobiscud} \cite{wang2013mobile}
 
 Napali fits in-between the CDN and Fog server architectures.
-The power quality disturbances are generally localized to a specific area, so a sink placement which covers a small geographical area are preferred in order to reduce latency and reduce unnecessary communication with the centralized cloud location.
+The power quality disturbances are generally localized to a specific area, so a sink placement which covers a small geographical area is preferred in order to reduce latency and reduce unnecessary communication with the centralized cloud location.
 Furthermore, sink-driven measurement rate allows the OPQ Box to dynamically scale the computational and communication overhead.
 Finally the event, classification and analysis are similar to the computational offloading strategies currently under development in the edge computing field.
 
@@ -98,8 +98,8 @@ Finally, since the PQube devices are designed for single location measurements, 
 
 Unlike the single point monitoring solutions, the Napali framework is incapable of operating as standalone PQ monitor without a cloud sink.
 Furthermore, even with the event detection sink, the goal of Napali is to reject local anomalies in order to reduce the communication and computational overhead.
-While not as sensitive as the PQube device, the deployment price per unit is two orders of magnitude lower, while providing better sensitivity then compared to the FNet device, when running with GPS.
-The ability of OPQ Box nodes to utilize NTP, with WIFI connectivity, means that the OPQ Box deployment is much simpler then the FNet and PSL offering, without requirements of a clear view of the sky or additional wiring for Ethernet and GPS antennas.
+While not as sensitive as the PQube device, the deployment price per unit is two orders of magnitude lower, while providing better sensitivity than compared to the FNet device, when running with GPS.
+The ability of OPQ Box nodes to utilize NTP, with WIFI connectivity, means that the OPQ Box deployment is much simpler than the FNet and PSL offering, without requirements of a clear view of the sky or additional wiring for Ethernet and GPS antennas.
 Finally, Napali distributed event detection system allows for acquisition of the entirety of the PQ disturbances including in locations where the disturbance has been greatly attenuated by the electrical distance.
 Thus, Napali is able to provide a more complete picture of the disturbance propagation throughout the smart grid.
 
@@ -118,7 +118,7 @@ Smart meter deployment is envisioned to communicate via a mesh network with a st
 As such the bandwidth and connectivity is limited, thus requiring methodology which is capable of event detection in such environments.
 Generalized local likelihood ratio detection is one method for overcoming these limitations.
 This approach requires only a single bit to be forwarded from each smart meter indicating whether a disturbance is taking place or not.
-These bits are aggregated at the ``master'' meter, and if their sum exceeds a threshold a higher level control system is notified of the ongoing disturbance.\cite{li2016cooperative} This approach is resilient to bandwidth limitations, and communication instability, however tunning thresholds for each individual meter requires a significant manual effort.
+These bits are aggregated at the ``master'' meter, and if their sum exceeds a threshold a higher level control system is notified of the ongoing disturbance.\cite{li2016cooperative} This approach is resilient to bandwidth limitations, and communication instability, however tuning thresholds for each individual meter requires a significant manual effort.
 
 Systems designed for distributed PQ event detection using custom meters are prevalent in literature.
 A study at CERN utilized PQube devices with gapless recording which were later analyzed off-line, in order to ascertain the propagation mechanics of PQ events.\cite{kahle2016power} In a realtime domain Shang Li and Xiaodong Wang extended their work in \cite{li2016cooperative} from smart meters to standalone devices, again advocating for single bit statistical based triggering generated by asynchronous meters.\cite{li2013monitoring} Unfortunately their work has never been verified beyond simulation.

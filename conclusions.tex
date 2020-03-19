@@ -18,7 +18,7 @@ Single location monitoring is unfeasible, due to a multitude of factors.
 Local noise from human activity results in a large number of false positives.
 Furthermore, single location monitoring is useless for development of an early warning system.
 Earthquake detection relies on prompt detection of P-waves, or pressure waves.
-These waves travel faster then their more destructive counterpart: S-waves.
+These waves travel faster than their more destructive counterpart: S-waves.
 A prompt detection and characterization of a P-wave can provide an early warning of an impending catastrophe.
 A large number of sensor networks of varying complexity and sophistication have been deployed in order to monitor geographic areas for seismic activity.\cite{burkett2014shakealert}\cite{zaicenco2012lessons}\cite{klapez2018first}\cite{finazzi2017statistical}
 
@@ -79,18 +79,18 @@ Currently IOT approaches are useless for scientific application, since only a ``
 With Napali useful high resolution data can be transmitted for later scientific analysis.
 
 \subsection{Lightning Detection}\label{subsec:lightning-detection}
-United States National Lightning Detection Network operates over 100 sensors across the United states. \cite{cummins1998combined}
-These lightning detectors create a sensor network used to record detect, localize and  classify lightning strikes.
+United States National Lightning Detection Network operates over 100 sensors across the United states\cite{cummins1998combined}.
+These lightning detectors create a sensor network used to record, detect, localize and  classify lightning strikes.
 Data from this network is made available for utilities, National Weather Service and to meteorologists for analysis and study.
 Potential uses for this data include cooperation with the Forestry Service, space flight providers, air traffic control, and wind farm operators in order to mitigate lighting risk.\cite{nag2013upgrade}
 Lightning detectors are placed in remote areas and communicate via satellite in order to limit interference from anthropogenic sources.
 The operational cost of such network can be reduced by placing the lighting detectors in urban centers and other locations they are supposed to protect.
 The local man-made noise presents an issue for traditional Self-Triggered operation of such a network, however using Napali, this noise can be filtered out.
 Napali has the potential to provide lighting detection at a fraction of the cost of a satellite based system.
-Furthermore, sub-threshold data from Napali would allow for better event localization and classification then a conventional Self-Triggered system.
+Furthermore, sub-threshold data from Napali would allow for better event localization and classification than a conventional Self-Triggered system.
 
 \subsection{Gunshot detection acoustic sensor networks}\label{subsec:gunshot-detection-acustic-sensor-network}
-Unfortunately, gunshot detection acoustic sensor networks are generally placed in urban areas.
+Gunshot detection acoustic sensor networks are generally placed in urban areas.
 A multitude of these sensor networks have been proposed in the literature, however the only known operational systems seem to be single
 location multi-microphone devices. \cite{bandi2012novel} \cite{khalid2013gunshot}
 There are however patents relating to multi-sensor gunshot detection systems, so it is possible that such systems are operated covertly.
@@ -109,7 +109,7 @@ The positron is immediately captured resulting in production of two gammas:
     e^+ +e^- \rightarrow \gamma + \gamma
 \end{equation}
 This is known as the prompt event and it is well characterized in both energy and time.
-The neutron will travel through it's medium until capture by a nucleus of an atom, resulting in additional gamma release.
+The neutron will travel through its medium until capture by a nucleus of an atom, resulting in additional gamma release.
 This is known as the delayed event, and it will occur within 200us of the initial interaction.
 The advantage of the inverse beta decay is that it allows for a well characterised and established detection mechanism for neutrino measurement.
 In fact it's the only mechanism we are aware of which uniquely identifies the neutrino.
@@ -169,13 +169,13 @@ A block diagram for the proposed battery backup subsystem is shown in Figure \re
 \end{figure}
 A single cell 14430 LiFePo battery with a capacity of $\approx 1Wh$ could power the OPQ Box for 2 hours in case of a power outage.
 A charge controller would keep the battery cell charged during normal operation and the DC-DC boost converter would provide 5V to the OPQ circuitry in case of a mains failure.
-This would allow the OPQ Box to record all of the data leading up to the power failure, and if the power outage is shorter then 2 hours capture the moment the power resumes.
+This would allow the OPQ Box to record all of the data leading up to the power failure, and if the power outage is shorter than 2 hours capture the moment the power resumes.
 A PCB and the battery cell would fit into the existing OPQ Box enclosure with minimum modifications.
 
 Another way to provide power failure resiliency is to add non-volatile memory to the sampler DSP.
 Every measurement taken by the DSP would be transferred to the non-volatile memory utilizing it as a circular buffer.
 This memory would serve as a black box recording the last measurements taken by the OPQ Box prior to the power failure.
-Flash is unsuitable for this due to a relatively small number of write cycles, prior to failure, however FRAM devices would be perfect for this application.
+Flash is unsuitable for this due to a relatively small number of write cycles prior to failure, however FRAM devices would be perfect for this application.
 2Mb FRAM devices are commonly available on the market, and would allow for an 11s recording window.
 The write endurance of $10^{14}$ IOPs results in the device remaining functional for 6000 years.
 Data retention of a common FRAM device is 5 years allowing for the data to remain retrievable through the worst of the power outages.
@@ -187,7 +187,7 @@ Due to the time constraints such deployment was outside of the scope of this dis
 The main goal of this evaluation would be to empirically measure how much of the end user's activity can be ascertained from the local events which are recorded at their residence.
 As such the subjects of these evaluation would deploy the OPQ device at their place of residence and carefully record the timestamp of every electrical appliance they interact with.
 From laboratory tests, the OPQ Box was able to detect voltage drops associated with common electrical equipment as shown in Figure \ref{intro:fig:1}.
-Since Napali ignores these events, it is expected that it would fair better with respect to end user privacy compared to the Naive and Self-Triggered methods.
+Since Napali ignores these events, it is expected that it would fare better with respect to end user privacy compared to the Naive and Self-Triggered methods.
 Napali does however transmit extracted metrics, however these are aggregated at 1s intervals.
 It's unclear how much privacy reduction the Napali methodology would be responsible for, or if the aggregation window length has an impact on privacy as a whole.
 
@@ -205,10 +205,10 @@ Every time a device is added to the network, Napali would start by acquiring its
 As enough data is acquired, the new device will be placed in the appropriate cluster in the triggering hierarchy, and restart normal operations.
 
 \subsection{Artificial Intelligence Integration into the Napali Trigger.}\label{subsec:artafitial-inteligence-integration-into-the-napali-trigger.}
-It is unclear if artificial intelligence approaches such as machine learning would fair better then the statistical trigger currently employed in Napali.
+It is unclear if artificial intelligence approaches such as machine learning would fare better than the statistical trigger currently employed in Napali.
 While outside the scope of this dissertation, the OPQ deployment provided a large database of metrics and events for training and testing AI constructs.
-Furthermore, the Makai triggering service is flexible enough to accommodate any number of triggering algorithms along side Napali for evaluation, characterization and comparison.
-The University of Hawaii power grid and the OPQ network remains a perfect test bed for evaluation of new and emerging power quality detection
+Furthermore, the Makai triggering service is flexible enough to accommodate any number of triggering algorithms alongside Napali for evaluation, characterization and comparison.
+The University of Hawaii power grid and the OPQ network remain a perfect test bed for evaluation of new and emerging power quality detection
 techniques through its flexible software architecture from hot-plugable metric extraction, to hot-plugable event detection and capture.
 
 \section{Summary of contributions}\label{sec:conclusions}
@@ -230,7 +230,7 @@ Section \ref{subsec:napali-bandwidth-usage} shows the analytical comparison of N
 Naturally, the Self-Triggered method fared the worst in this evaluation, since every sample from every device needed to be processed on the sink.
 For Napali, overhead in the event detection is minuscule, since the metric comparison and filtering is linear with the number of devices,
 resulting in a modest resource consumption increase compared to the Self-Triggered method.
-The Self-Triggered method, arguably requires no sink resources when it comes to event detection, however the higher levels of event evaluation are impacted by the additional data burden.
+The Self-Triggered method arguably requires no sink resources when it comes to event detection, however the higher levels of event evaluation are impacted by the additional data burden.
 For every false positive event that the Self-Triggered framework captures, an additional computational cost is incurred.
 While the characterization of this cost is beyond the scope of this work, it was shown that the incurred cost is significant when compared to Napali.
 
@@ -248,8 +248,8 @@ The main evaluation of this claim comes from the ground truth measurements deliv
 Napali was able to capture every event observed by the meters located higher on the power grid hierarchy apart from localized single phase faults.
 The main contribution of this claim is that the power grid can be monitored from regular household voltages without any contribution from the utility company.
 This opens a door to an oversight mechanism to monitor Utility due diligence when it comes to the power quality standard.
-Furthermore, OPQ was demonstrated to be a reliable system which can be used in conjunction with, but independently from the Utility for power grid protection.
-With the increasing concern in Utility cyber security, an additional independent system is both desired and required.
+Furthermore, OPQ was demonstrated to be a reliable system which can be used in conjunction with, but independently from, the Utility for power grid protection.
+With the increasing concern about Utility cyber security, an additional independent system is both desired and required.
 
 \subsection{Sub-threshold data acquisition is a viable event detection strategy}\label{subsec:conc:sub-threshold-data-acquisition}
 Section \ref{subsec:sub-threshold-data-acquisition} describes the subthreshold detection capability of Napali in the OPQ network.

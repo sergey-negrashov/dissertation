@@ -41,7 +41,7 @@ As shown, the resulting distribution of collected $V_{rms}$ measurements, acquir
 
 THD performance of the OPQBox was validated by injecting a various harmonics of 60Hz superimposed onto the 60Hz, $120mV_{rms}$ sine wave into the device via the SDG1025 arbitrary waveform generation capability.
 THD calculation results were acquired from the OPQBox triggering stream for analysis.
-As expected, the resulting remained self-consistent across all harmonics.
+As expected, the resulting detection efficiency remained self-consistent across all harmonics.
 Figure~\ref{fig:expdes:3} shows a histogram of the error in THD values computed from a 60Hz, $120mV_{rms}$ sinewave superimposed with a 240Hz $1.2mV_{rms}$ sine wave.
 This measurement is equivalent to $1\%$ THD at the $4^{th}$ harmonic.
 
@@ -53,7 +53,7 @@ This measurement is equivalent to $1\%$ THD at the $4^{th}$ harmonic.
     \label{fig:expdes:3}
 \end{figure}
 
-As shown, the resulting distribution of collected THD measurements, acquired over 2000s has a $\sigma=0.001\%$.
+As shown, the resulting distribution of collected THD measurements, acquired over 2000s, has a $\sigma=0.001\%$.
 
 \subsection{Transient Detection}
 
@@ -96,9 +96,9 @@ This location was advantageous because it is an isolated microgrid connected to 
 Another advantage of the UH campus is the high number of smart meters deployed across various levels of the power delivery infrastructure.
 While the purpose of these meters is to monitor the power consumption, they do include some rudimentary power quality monitoring capabilities.
 Data from the campus deployed meters was used as ground truth for comparison against the measurements, and for analysis performed by the OPQ project.
-The location of smart meter's in the grid topology is shown in Figure~\ref{expdes:fig:1} as the $M$ nodes.
+The location of smart meters in the grid topology is shown in Figure~\ref{expdes:fig:1} as the $M$ nodes.
 As evident by the meter location none of them were monitoring the consumer level power and mainly focused on the higher voltage power delivery.
-This placement was a consequence of the smart meters role as a consumption monitor, and thus the deployment of the OPQ Boxes at the residential level complimented UH power quality monitoring capabilities without introducing redundancies.
+This placement was a consequence of the smart meters' role as a consumption monitor, and thus the deployment of the OPQ Boxes at the residential level complemented UH power quality monitoring capabilities without introducing redundancies.
 
 The University of Hawaii power grid supplies a highly diverse infrastructure.
 Beyond traditional residential equipment such as computers and consumer grade electronics, the UH power grid powers scientific and laboratory equipment, machine shops, and server farms.
@@ -114,7 +114,7 @@ For example, the free electron laser located in the Watanabe Hall is one of the 
 
 There are 74 smart meters deployed across the UH campus.
 These meters measured the fundamental frequency $V_{rms}$, power consumption, reactive power, and power factor.
-Data from these meters was cross-referenced with the Napali detection system in order to ascertain it's benefits.
+Data from these meters was cross-referenced with the Napali detection system in order to ascertain its benefits.
 
 OPQ Box placement was specifically selected to cover as much of the University of Hawaii power delivery infrastructure as possible.
 The OPQ Box deployment is shown in Figure \ref{expdes:fig:deploy}.
@@ -124,7 +124,7 @@ Figure \ref{expdes:fig:grid_wide_filtered} shows the same event with the fundame
 Furthermore, a location annotation is added to indicate the device deployment.
 The most affected devices were located at the Physical Plant and Hamilton Library, recording a $~60V_{pp}$ transient.
 Incidentally, both of these devices are monitoring a subgrid rooted at transformer(MA4).
-Another device recorded this event was located in Watanabe Hall.
+Another device that recorded this event was located in Watanabe Hall.
 This device recorded a $30V_{pp}$ transient, still above the threshold for detection.
 This device was monitoring the the subgrid rooted at the transformer LA4.
 The final device was located at the parking structure entirely across campus.
@@ -140,7 +140,7 @@ However, Napali was able to determine that the parking structure OPQ Box was aff
 
 From the data gathered by Napali as shown in Figure \ref{expdes:fig:grid_wide_filtered}, it seems apparent that the disturbance originated at the subgrid rooted at the transformer MA4.
 The Watanabe device was affected due to the short geographic and electrical distance to the MA4 subgrid.
-By the time transient reached the parking structure, it was significantly attenuated by the transformers and transmission lines.
+By the time the transient reached the parking structure, it was significantly attenuated by the transformers and transmission lines.
 It was only detected due to the sub-threshold detection ability of the Napali framework.
 
 \begin{figure}[H]
@@ -164,12 +164,12 @@ These statistics are in turn used during the Napali triggering process to locate
 A smaller $\alpha$ parameter corresponds to a longer memory in the low pass filter as shown in Equation \ref{eq:iir_alpha}.
 This is further visualized in Figure \ref{fig:expdes:5}.
 In particular this Figures \ref{fig:expdes:5:1} and \ref{fig:expdes:5:2} show the response of the IIR low pass filter to the simulated frequency measurements.
-The dashed red line represents the frequency measurement, solid red line represents the filtered mean, and the blue line represents the standard diviation.
+The dashed red line represents the frequency measurement, solid red line represents the filtered mean, and the blue line represents the standard deviation.
 Figures \ref{fig:expdes:5:1} shows the filter response for $\alpha = 0.5$ or $T_{memory} \approx 10s $.
-As evident from the plot, the mean and the standard deviation quickly recover from the transient are return to their nominal values.
+As evident from the plot, the mean and the standard deviation quickly recover from the transient and return to their nominal values.
 Furthermore, the mean is closely tracking the random fluctuations present in the measurement.
 Figures \ref{fig:expdes:5:1} shows the filter response for $\alpha = 0.05$ or $T_{memory} \approx 123s $.
-While the stimuli remains the same, it takes significantly longer the statistics to recover.
+While the stimuli remains the same, it takes significantly longer for the statistics to recover.
 Additionally, the mean no longer tracks the frequency fluctuations present in the simulated data.
 \begin{figure}[ht!]
     \centering
@@ -293,7 +293,7 @@ Similarly to locations in category 2, data from these devices proved useful in s
 
 There are several types of events that Napali is able to detect.
 The first category are gridwide events.
-Gridwide events effect every device on the OPQ network, with each device passing one of the designated threshold.
+Gridwide events affect every device on the OPQ network, with each device passing one of the designated threshold.
 Gridwide events inherently lack a subthreshold component since every device captures over-threshold data.
 Partial gridwide events are events that affect only a subset of devices enough to pass the threshold and trigger data collection.
 One of the main goals of Napali is to utilize metric extraction in order to detect sub-threshold events.
@@ -386,7 +386,7 @@ During the deployment, OPQ network achieved 97\% availability with only downtime
 \section{Results of experimental evaluation}\label{sec:napali-validation}
 
 Napali was validated using simulation, synthetic data with the device-in-loop, and in-situ during the deployment.
-n this section I present the results of the evaluation of the claims of my dissertation as discussed in Section \ref{intro:sec:claim}.
+In this section I present the results of the evaluation of the claims of my dissertation as discussed in Section \ref{intro:sec:claim}.
 
 \subsection{Napali Bandwidth usage}\label{subsec:napali-bandwidth-usage}
 During the OPQ deployment it was found that Napali significantly outperformed both the Self-Triggered and the Naive event detection methods.
@@ -462,7 +462,7 @@ Modern sensor networks greatly benefit from two way communication, as it allows 
 With addition of Napali, two way communication allows for significant bandwidth requirement reduction in for the sensor network as a whole.
 
 This result validates the claim described in Section \ref{subsec:napali-minimizes-bandwidth-useage}.
-Napali event detection method significantly reduces the bandwidth cost associated with power quality event detection.
+The Napali event detection method significantly reduces the bandwidth cost associated with power quality event detection.
 
 \subsection{Sink processing requirement under the Napali Framework}\label{subsec:sink-processing-requirement-under-the-napali-framework}
 Sink processing requirements for event detection between Self-Triggered, Naive and Napali are quite different.
@@ -476,7 +476,6 @@ In general the processing requirement can be described as follows:
 In the Equation \ref{eq:detection_cost} the $C_{total}$ is the total cost, $C_{metric\_extraction}$ is the cost of extracting metrics and $C_{detection}$ is the cost of event detection.\cite{de2015effective}
 Each of the three methods, Napali, Self-Triggered, and Naive, have different sink costs associated with each parameter.
 
-As stated in the claim
 
 \subsubsection{Sink processing: Naive Method}
 
@@ -486,7 +485,7 @@ Disregarding the processing power required to keep up with the data rate describ
 In order perform this measurement, OPQ Box software was built for an x86 architecture and stress-tested.
 Instead of acquiring data from a device driver, the feature extraction stack was supplied with synthetic data.
 Finally, the ZMQ communication was removed and replaced with the performance analysis code.
-Stress test was performed on a Intel Core i9-8950HK CPU with thermal management disabled running at 2.9GHz.
+Stress test was performed on an Intel Core i9-8950HK CPU with thermal management disabled running at 2.9GHz.
 Under such conditions, the metric extraction stack was able to extract features from 1s worth of raw data in $800us$ running on a single core.
 Since metric extraction has no inter-device data dependencies, a modern 8 core CPU can expect to keep up with feature extraction from 1000 devices.
 If an OPQ Box sensor is used with 16 bit samples and 12kSps ADC, aggregate bandwidth for such system is 10.8Gbps, which is well within the realm of a collocated server with dual 10Gbps network interfaces.
@@ -498,7 +497,7 @@ and does not significantly contribute to the $C_{total}$.
 
 \subsubsection{Sink Processing: Naive Method}
 
-In contrast to the Naive method, the Self-Triggered method, has no sink processing requirements, since all of the feature-extraction is performed on the edge device.
+In contrast to the Naive method, the Self-Triggered method has no sink processing requirements, since all of the feature-extraction is performed on the edge device.
 Thus, Self-Triggered method event detection is only limited by the available network bandwidth.
 
 \subsubsection{Sink Processing: Napali Method}
@@ -563,7 +562,7 @@ As depicted, the majority of events captured by Napali were less then 20s in len
 
 Figure \ref{expdes:fig:latency} was generated by requesting a 20s event from all OPQ Box devices and timing the amount of time it takes them to respond.
 Since this measurement can be performed synthetically without waiting for an anomaly, 10000 samples were used, which equates to approximately ten months of real world measurements.
-Latencies clustered into two groups, likely based on the signal strength of the WIFI networks, with means of 12.5ms and 50ms.
+Latencies clustered into two groups, likely based on the number of retransmission required for the senor to reach the router, with means of 12.5ms and 50ms.
 A few stragglers were observed at at 200ms and a single device had a latency of 1.2s, and was omitted from Figure \ref{expdes:fig:latency} for clarity.
 
 Since OPQ Boxes communicate via WiFi it is common for them to lose connections to the access point, and reconnect some time later.
@@ -702,9 +701,9 @@ However, it is also the most robust when it comes to event detection, both local
 As such, the Naive method is best left for monitoring high value infrastructure such as substations and production centers which can afford the additional computational and bandwidth cost.
 
 \subsection{Temporal locality triggering of the Napali framework} \label{subsec:temporal-locality-triggering-of-the-napali-framework}
-As mentioned previously, during the University of Hawaii deployment the OPQ network worked along side the utility grade meters embedded in the University power delivery infrastructure.
+As mentioned previously, during the University of Hawaii deployment the OPQ network worked alongside the utility grade meters embedded in the University power delivery infrastructure.
 Data from these devices provided ground truth when it came to evaluating OPQ power quality anomaly detection.
-Before we delve deeper into that, will compare the OPQ Box and utility meter metric extraction capabilities.
+Before we delve deeper into that, I will compare the OPQ Box and utility meter metric extraction capabilities.
 
 \subsubsection{Utility meter metric extraction comparison} \label{subsubsec:utility-box-comp}
 Eight OPQ devices were collocated along with smart utility meters capable of logging power quality metrics.
@@ -760,7 +759,7 @@ This fact is further illustrated in Figure \ref{expdes:fig:postmain2:thd_diff}.
     \label{expdes:fig:postmain2:thd_diff}
 \end{figure}
 
-Figure \ref{expdes:fig:postmain2:thd_diff} shows the difference in measurement between the OPQ device and the utility meter.
+Figure \ref{expdes:fig:postmain2:thd_diff} shows the histograms of the difference in measurement between the OPQ device and the utility meter.
 In blue are the samples occurring during the seemingly coincidental regions of 18:00-6:00.
 These regions are characterized by an excellent agreement between the two devices, with difference given by $sigma =0.02\%$.
 This level of agreement is comparable to the synthetic benchmarks of the OPQ box with a well calibrated source.
